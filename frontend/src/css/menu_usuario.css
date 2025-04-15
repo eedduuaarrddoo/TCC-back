@@ -1,0 +1,158 @@
+/* Reset e fundo geral */
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #e6f0fa;
+  }
+  
+  /* Centraliza tudo com grid */
+  .page-container {
+    display: grid;
+    place-items: center;
+    height: 100vh;
+  }
+  
+  /* Painel principal */
+  .user-panel {
+    background-color: #ffffff;
+    padding: 2rem;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 900px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Títulos */
+  .user-panel h2 {
+    font-size: 24px;
+    color: #3b82f6;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+  
+  .user-panel h3 {
+    font-size: 18px;
+    color: #333;
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Tabela */
+  .sample-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+  }
+  
+  .sample-table th,
+  .sample-table td {
+    padding: 0.75rem;
+    border: 1px solid #ccc;
+    text-align: center;
+  }
+  
+  .sample-table th {
+    background-color: #3b82f6;
+    color: white;
+  }
+  
+  .sample-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+  
+  /* Botões */
+  .user-panel button {
+    width: 100%;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 6px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: 0.5rem;
+    transition: 0.2s ease-in-out;
+  }
+  
+  .user-panel .btn-blue {
+    background-color: #3b82f6;
+  }
+  
+  .user-panel .btn-blue:hover {
+    background-color: #2563eb;
+  }
+  
+  .user-panel .btn-yellow {
+    background-color: #facc15;
+    color: #333;
+  }
+  
+  .user-panel .btn-yellow:hover {
+    background-color: #eab308;
+  }
+  
+  .user-panel .btn-green {
+    background-color: #22c55e;
+  }
+  
+  .user-panel .btn-green:hover {
+    background-color: #16a34a;
+  }
+  
+  /* Popup */
+  .popup-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: grid;
+    place-items: center;
+  }
+  
+  .popup {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 10px;
+    width: 400px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  }
+  
+  .popup h2 {
+    font-size: 20px;
+    margin-bottom: 1rem;
+    color: #3b82f6;
+  }
+  
+  /* Inputs */
+  .popup input {
+    width: 100%;
+    padding: 0.5rem;
+    margin-bottom: 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  /* Botões do popup */
+  .popup .btn-container {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .popup .btn-container button {
+    width: 48%;
+    padding: 0.6rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .popup .btn-blue {
+    background-color: #3b82f6;
+    color: white;
+  }
+  
+  .popup .btn-red {
+    background-color: #ef4444;
+    color: white;
+  }
+  
