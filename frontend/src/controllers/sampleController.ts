@@ -1,3 +1,5 @@
+//ESSE VAI SER O CONTROLLER DO MENU ADMIN
+
 import api from "../services/api";
 
 interface SampleData {
@@ -8,10 +10,18 @@ interface SampleData {
   user_id: number;
 }
 
+export interface UserData {
+  username: string;
+  email: string;
+  password: string;
+  is_admin: boolean;
+}
+
+
 export const createSample = async (data: SampleData) => {
   try {
     const response = await api.post("/sample/create/", data);
-    return response.data; // Retorna os dados da API
+    return response.data; 
   } catch (error: any) {
     console.error("Erro ao cadastrar amostra:", error.response?.data || error);
     throw error.response?.data || "Erro desconhecido";
@@ -47,5 +57,48 @@ export const updateSample = async (id: number, updatedData: Partial<SampleData>)
   } catch (error: any) {
     console.error("Erro ao atualizar amostra:", error.response?.data || error);
     throw error.response?.data || "Erro desconhecido";
+  }
+};
+
+
+export const editUser = async (id: number, updatedData: Partial<UserData>) => {
+  try {
+    const response = await api.put(`/update/${id}/`, updatedData);
+    return response.data;
+  } catch (error: any) {
+    console.error("Erro ao editar usuário:", error.response?.data || error);
+    throw error.response?.data || "Erro desconhecido";
+  }
+};
+
+
+export const deleteUser = async (id: number) => {
+  try {
+    const response = await api.delete(`/delete/${id}/`);
+    return response.data;
+  } catch (error: any) {
+    console.error("Erro ao deletar usuário:", error.response?.data || error);
+    throw error.response?.data || "Erro desconhecido";
+  }
+};
+
+export const getAllUsers = async () => {
+  try {
+    const response = await api.get("/allusers/");
+    return response.data; // isso será um array de usuários
+  } catch (error: any) {
+    console.error("Erro ao buscar usuários:", error.response?.data || error);
+    throw error.response?.data || "Erro desconhecido";
+  }
+};
+
+
+export const getSampleDetails = async (sampleId: number) => {
+  try {
+    const response = await api.get(`sample/sampledetail/${sampleId}/`);
+    return response.data;
+  } catch (error: any) {
+    console.error("Erro ao buscar detalhes:", error.response?.data || error);
+    throw error.response?.data || "Erro ao carregar detalhes";
   }
 };

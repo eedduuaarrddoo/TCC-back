@@ -43,10 +43,26 @@ def list_samples(request):
     
 @api_view(["GET"])
 def list_all_samples(request):
-   
-    samples = Sample.objects.all()  # Busca todas as amostras
+    # Obtém os parâmetros de ordenação da URL
+    sort_field = request.GET.get("sort", "id")
+    sort_order = request.GET.get("order", "asc")
+
+    # Lista de campos permitidos para ordenação
+    allowed_fields = ['id', 'ph', 'nome', 'data_coleta']  # Adapte com seus campos reais
+
+    # Validação básica do campo
+    if sort_field not in allowed_fields:
+        sort_field = 'id'
+
+    # Aplica o prefixo "-" para ordenação descendente
+    if sort_order == 'desc':
+        sort_field = f'-{sort_field}'
+
+    # Busca ordenada no banco
+    samples = Sample.objects.all().order_by(sort_field)
     serializer = SampleSerializer(samples, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 
 @api_view(["DELETE"])
@@ -81,3 +97,15 @@ def update_sample(request, sample_id):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+@api_view(["GET"])
+def get_sample_details(request, sample_id):
+    try:
+        sample = Sample.objects.get(id=sample_id)
+    except Sample.DoesNotExist:
+        return Response({"error": "Amostra não encontrada"}, status=status.HTTP_404_NOT_FOUND)
+
+    serializer = SampleSerializer(sample)
+    return Response(serializer.data, status=status.HTTP_200_OK)

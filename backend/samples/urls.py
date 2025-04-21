@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import create_sample, list_all_samples, list_samples, delete_samples, update_sample
+from .views import create_sample, list_all_samples, list_samples, delete_samples, update_sample ,get_sample_details
 
 urlpatterns = [
     path("create/", create_sample, name="create_sample"),
@@ -7,4 +7,5 @@ urlpatterns = [
     path("listall/", list_all_samples, name="list_all_samples"),
     path("delete/", delete_samples, name="delete_samples"),
     path("update/<int:sample_id>/",update_sample, name="update_sample"),
+    path('sampledetail/<int:sample_id>/', get_sample_details, name="sample-detail"),
 ]

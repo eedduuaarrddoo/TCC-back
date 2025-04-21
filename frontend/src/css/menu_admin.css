@@ -155,4 +155,44 @@ html, body {
     background-color: #ef4444;
     color: white;
   }
+  .btn-purple {
+    background-color: purple;
+    color: white;
+    padding: 8px 12px;
+    margin: 0 4px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
   
+  .btn-purple:hover {
+    background-color: #7a0bc0;
+  }
+  
+ 
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem;
+  border-radius: 4px;
+  background: #f8f9fa;
+}
+
+.detail-label {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 0.9rem;
+}
+
+.detail-value {
+  color: #34495e;
+  margin-top: 0.3rem;
+  font-size: 1rem;
+}

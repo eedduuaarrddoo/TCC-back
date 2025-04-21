@@ -13,5 +13,9 @@ class Sample(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)  # Data de criação
     updated_at = models.DateTimeField(auto_now=True)  # Data da última atualização
 
+    atributo1 = models.CharField(max_length=255, null=True)  
+    atributo2 = models.FloatField(null=True)               
+    atributo3 = models.IntegerField(null=True)     
+
     def __str__(self):
         return f"Amostra de {self.user.first_name} em {self.location}"

@@ -1,3 +1,5 @@
+//CONTROLLER DA PAG CADASTRAR
+
 import api from "../services/api";
 
 interface RegisterData {

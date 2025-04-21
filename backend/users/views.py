@@ -66,5 +66,38 @@ def logout_view(request):
 def list_all_users(request):
    
     user = User.objects.all()  
-    serializer = UserSerializer(user)
+    serializer = UserSerializer(user, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(["DELETE"])
+def delete_user(request, user_id):
+    try:
+        user = User.objects.get(id=user_id)
+        user.delete()
+        return Response({"message": "Usuário deletado com sucesso"}, status=status.HTTP_200_OK)
+    except User.DoesNotExist:
+        return Response({"error": "Usuário não encontrado"}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(["PUT"])
+def edit_user(request, user_id):
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        return Response({"error": "Usuário não encontrado"}, status=status.HTTP_404_NOT_FOUND)
+
+    data = request.data
+
+    user.username = data.get("username", user.username)
+    user.email = data.get("email", user.email)
+    user.is_admin = data.get("is_admin", user.is_admin)
+
+    # Se uma nova senha for fornecida, atualize
+    if "password" in data and data["password"]:
+        user.set_password(data["password"])
+
+    user.save()
+
+    serializer = UserSerializer(user)
+    return Response({"message": "Usuário atualizado com sucesso", "user": serializer.data}, status=status.HTTP_200_OK)
