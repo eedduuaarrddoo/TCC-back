@@ -109,3 +109,17 @@ def get_sample_details(request, sample_id):
 
     serializer = SampleSerializer(sample)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from .models import Sample
+
+@api_view(["GET"])
+def get_user_samples_ids(request, user_id):
+    try:
+        samples_ids = Sample.objects.filter(user=user_id).values_list('id', flat=True)
+        return Response({'samples_ids': list(samples_ids)}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)

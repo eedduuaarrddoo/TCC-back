@@ -7,7 +7,8 @@ import {
   getAllUsers,
   deleteUser,
   editUser,
-  getSampleDetails
+  getSampleDetails,
+  getUserSamplesIds
 } from "../controllers/sampleController";
 import SampleTable from "../components/SampleTable";
 import UserTable from "../components/UserTable";
@@ -34,7 +35,8 @@ const MenuAdmin = () => {
   const [editIsAdmin, setEditIsAdmin] = useState(false);
   const [showDetailsPopup, setShowDetailsPopup] = useState(false);
   const [selectedSample, setSelectedSample] = useState<any>(null);
-
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+  const [userSamplesIds, setUserSamplesIds] = useState<number[]>([]);
 
   useEffect(() => {
     const storedUserName = localStorage.getItem("username");
@@ -196,6 +198,26 @@ const MenuAdmin = () => {
     }
   };
 
+  const handleSelectSample = async (sampleId: number) => {
+    try {
+      const detailedSample = await getSampleDetails(sampleId);
+      setSelectedSample(detailedSample);
+      setShowDetailsPopup(true);
+    } catch (error) {
+      alert("Erro ao carregar detalhes da amostra");
+    }
+  };
+
+  const handleGetUserSamples = async (userId: number) => {
+    try {
+      const ids = await getUserSamplesIds(userId);
+      setUserSamplesIds(ids);
+      setSelectedUserId(userId);
+    } catch (error) {
+      console.error("Falha ao carregar amostras:", error);
+      setUserSamplesIds([]);
+    }
+  };
 
 
   return (
@@ -232,6 +254,10 @@ const MenuAdmin = () => {
             users={users}
             onEdit={startEditUser}
             onDelete={handleDeleteUser}
+            onViewSamples={handleGetUserSamples}
+            userSamplesIds={userSamplesIds}
+            selectedUserId={selectedUserId}
+            onSelectSample={handleSelectSample}
           />
         ) : (
           <>

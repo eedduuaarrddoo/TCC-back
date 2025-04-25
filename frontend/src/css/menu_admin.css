@@ -196,3 +196,43 @@ html, body {
   margin-top: 0.3rem;
   font-size: 1rem;
 }
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  position: relative;
+}
+
+.samples-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  z-index: 100;
+  min-width: 150px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.sample-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.sample-item:hover {
+  background-color: #f5f5f5;
+}
+
+.no-samples {
+  padding: 8px 12px;
+  color: #666;
+  font-style: italic;
+}
+
+.btn-icon:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

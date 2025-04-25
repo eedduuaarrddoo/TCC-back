@@ -85,7 +85,7 @@ export const deleteUser = async (id: number) => {
 export const getAllUsers = async () => {
   try {
     const response = await api.get("/allusers/");
-    return response.data; // isso será um array de usuários
+    return response.data; 
   } catch (error: any) {
     console.error("Erro ao buscar usuários:", error.response?.data || error);
     throw error.response?.data || "Erro desconhecido";
@@ -100,5 +100,16 @@ export const getSampleDetails = async (sampleId: number) => {
   } catch (error: any) {
     console.error("Erro ao buscar detalhes:", error.response?.data || error);
     throw error.response?.data || "Erro ao carregar detalhes";
+  }
+};
+
+
+export const getUserSamplesIds = async (userId: number): Promise<number[]> => {
+  try {
+    const response = await api.get(`sample/usersamples/${userId}/`);
+    return response.data.samples_ids; 
+  } catch (error: any) {
+    console.error("Erro ao buscar IDs das amostras:", error.response?.data || error);
+    throw error.response?.data || "Erro ao buscar amostras do usuário";
   }
 };
