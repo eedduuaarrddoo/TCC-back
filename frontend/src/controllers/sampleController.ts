@@ -4,10 +4,12 @@ import api from "../services/api";
 
 interface SampleData {
   location: string;
-  //date: string;
   ph: number;
   depth: number;
   user_id: number;
+  atributo1?: string;
+  atributo2?: number | null;
+  atributo3?: number | null;
 }
 
 export interface UserData {
@@ -111,5 +113,17 @@ export const getUserSamplesIds = async (userId: number): Promise<number[]> => {
   } catch (error: any) {
     console.error("Erro ao buscar IDs das amostras:", error.response?.data || error);
     throw error.response?.data || "Erro ao buscar amostras do usuário";
+  }
+};
+
+export const searchSamplesByLocation = async (location: string) => {
+  try {
+    const response = await api.get(`/sample/search/location/`, {
+      params: { location }, // Envia o parâmetro de busca via query string
+    });
+    return response.data; // Retorna a lista de amostras encontradas
+  } catch (error: any) {
+    console.error("Erro ao buscar amostras por localização:", error.response?.data || error);
+    throw error.response?.data || "Erro ao buscar por localização";
   }
 };

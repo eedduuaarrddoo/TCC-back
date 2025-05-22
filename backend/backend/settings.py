@@ -32,6 +32,8 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'users',
     'samples',
+    'metodologia',
+    'discsamples',
     'corsheaders',
 ]
 
