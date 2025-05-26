@@ -13,10 +13,22 @@ class Sample(models.Model):
     metodologia = models.ForeignKey(Metodologia, on_delete=models.CASCADE,null=True,blank=True, related_name='amostras')  # Relação com metodologia
     created_at = models.DateTimeField(auto_now_add=True)  # Data de criação
     updated_at = models.DateTimeField(auto_now=True)  # Data da última atualização
-
-    atributo1 = models.CharField(max_length=255, null=True)  
-    atributo2 = models.FloatField(null=True)               
-    atributo3 = models.IntegerField(null=True)     
+    spacamento = models.CharField(max_length=255, null=True, blank=True)
+    arvore = models.CharField(max_length=255, null=True, blank=True)
+    porcentagem = models.CharField(max_length=255, null=True, blank=True)
+    observacao = models.CharField(max_length=255, null=True, blank=True)
+    espacamento2 = models.CharField(max_length=255, null=True, blank=True)
+    altura = models.CharField(max_length=255, null=True, blank=True)
+    profundidade_info = models.CharField(max_length=255, null=True, blank=True)  # nome diferente para não confundir com o campo `depth`
+    vertice = models.CharField(max_length=255, null=True, blank=True)
+    talhao = models.CharField(max_length=255, null=True, blank=True)
+    parcela = models.CharField(max_length=255, null=True, blank=True)
+    tratamento = models.CharField(max_length=255, null=True, blank=True)
+    identificacao = models.CharField(max_length=255, null=True, blank=True)
+    ac = models.CharField(max_length=255, null=True, blank=True)
+    anexo1 = models.CharField(max_length=255, null=True, blank=True)
+    anexo2 = models.CharField(max_length=255, null=True, blank=True)
+    
 
     def __str__(self):
         return f"Amostra de {self.user.first_name} em {self.location}"
