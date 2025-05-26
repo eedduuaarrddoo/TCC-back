@@ -15,6 +15,8 @@ import SampleTable from "../components/SampleTable";
 import UserTable from "../components/UserTable";
 import "../css/menu_admin.css";
 import SampleDetailsModal from "../components/SampleDetailsModal";
+import SampleCreatePopup from "../components/SampleCreatePopup";
+import SampleEditPopup from "../components/sampleEditModal";
 
 const MenuAdmin = () => {
   const [userName, setUserName] = useState<string | null>(null);
@@ -22,13 +24,8 @@ const MenuAdmin = () => {
   const [samples, setSamples] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: "asc" | "desc" } | null>(null);
-  const [showPopup, setShowPopup] = useState(false);
   const [showEditPopup, setShowEditPopup] = useState(false);
   const [editingSample, setEditingSample] = useState<any | null>(null);
-  const [location, setLocation] = useState("");
-  //const [date, setDate] = useState("");
-  const [ph, setPh] = useState("");
-  const [depth, setDepth] = useState("");
   const [showUserEditPopup, setShowUserEditPopup] = useState(false);
   const [editingUser, setEditingUser] = useState<any | null>(null);
   const [editUsername, setEditUsername] = useState("");
@@ -38,10 +35,8 @@ const MenuAdmin = () => {
   const [selectedSample, setSelectedSample] = useState<any>(null);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
   const [userSamplesIds, setUserSamplesIds] = useState<number[]>([]);
-  const [atributo1, setAtributo1] = useState("");
-  const [atributo2, setAtributo2] = useState("");
-  const [atributo3, setAtributo3] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [showCreatePopup, setShowCreatePopup] = useState(false);
   useEffect(() => {
     const storedUserName = localStorage.getItem("username");
     if (storedUserName) setUserName(storedUserName);
@@ -67,37 +62,9 @@ const MenuAdmin = () => {
     }
   };
 
-  const handleCreateSample = async () => {
-    const storedUserID = localStorage.getItem("user_id");
-    if (!storedUserID) {
-      alert("Usuário não encontrado. Faça login novamente.");
-      return;
-    }
   
-    try {
-      await createSample({
-        location,
-        ph: parseFloat(ph),
-        depth: parseFloat(depth),
-        atributo1,
-        atributo2: atributo2 ? parseFloat(atributo2) : null,
-        atributo3: atributo3 ? parseFloat(atributo3) : null,
-        user_id: 0
-      });
-      alert("Amostra cadastrada com sucesso!");
-      setShowPopup(false);
-      setLocation("");
-      setPh("");
-      setDepth("");
-      setAtributo1("");
-      setAtributo2("");
-      setAtributo3("");
-      fetchSamples();
-    } catch (error) {
-      alert("Erro ao cadastrar amostra.");
-    }
-  };
-
+   
+     
   const handleDeleteSample = async (id: number) => {
     const confirmar = window.confirm(`Tem certeza que deseja excluir a amostra ${id}?`);
     if (!confirmar) return;
@@ -126,33 +93,25 @@ const MenuAdmin = () => {
     }
   };
 
-  const startEditSample = (sample: any) => {
+   const startEditSample = (sample: any) => {
     setEditingSample(sample);
-    setLocation(sample.location);
-    setPh(sample.ph.toString());
-    setDepth(sample.depth.toString());
-    //setDate(sample.created_at.slice(0, 10));
     setShowEditPopup(true);
   };
 
-  const handleEditSample = async () => {
+  const handleEditSampleSubmit = async (formData: FormData) => {
     if (!editingSample) return;
-
     try {
-      await updateSample(editingSample.id, {
-        location,
-        ph: parseFloat(ph),
-        depth: parseFloat(depth),
-      });
+      await updateSample(editingSample.id, formData);
       alert("Amostra atualizada com sucesso!");
       setShowEditPopup(false);
       setEditingSample(null);
       fetchSamples();
     } catch (error) {
-      alert("Erro ao atualizar a amostra.");
       console.error(error);
+      alert("Erro ao atualizar a amostra.");
     }
   };
+
 
   const startEditUser = (user: any) => {
     setEditingUser(user);
@@ -324,8 +283,8 @@ const handleSearch = async () => {
             onView={handleViewSample}
           />
           <div className="btn-group">
-            <button className="btn-blue" onClick={() => setShowPopup(true)}>
-              Cadastrar Amostra
+            <button className="btn-blue" onClick={() => setShowCreatePopup(true)}>
+                      Cadastrar Amostra
             </button>
             <button className="btn-green" onClick={fetchSamples}>
               Atualizar Lista
@@ -336,118 +295,25 @@ const handleSearch = async () => {
     </div>
 
     {/* POPUP DE CADASTRO */}
-    {showPopup && (
-      <div className="popup-overlay">
-        <div className="popup">
-          <h2>Cadastrar Amostra</h2>
-          <input
-            type="text"
-            placeholder="Local da Amostra"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-          />
-          {/* campo de data removido */}
-          <input
-            type="number"
-            placeholder="pH"
-            value={ph}
-            onChange={(e) => setPh(e.target.value)}
-          />
-          <input
-            type="number"
-            placeholder="Profundidade (m)"
-            value={depth}
-            onChange={(e) => setDepth(e.target.value)}
-          />
-
-          {/* novos campos */}
-          <input
-            type="text"
-            placeholder="Atributo 1"
-            value={atributo1}
-            onChange={(e) => setAtributo1(e.target.value)}
-          />
-          <input
-            type="number"
-            placeholder="Atributo 2"
-            value={atributo2}
-            onChange={(e) => setAtributo2(e.target.value)}
-          />
-          <input
-            type="number"
-            placeholder="Atributo 3"
-            value={atributo3}
-            onChange={(e) => setAtributo3(e.target.value)}
-          />
-
-          <div className="btn-container">
-            <button className="btn-blue" onClick={handleCreateSample}>
-              Cadastrar
-            </button>
-            <button className="btn-red" onClick={() => setShowPopup(false)}>
-              Fechar
-            </button>
-          </div>
-        </div>
-      </div>
-    )}
+    {showCreatePopup && (
+  <SampleCreatePopup
+    onClose={() => setShowCreatePopup(false)}
+    onSubmitSuccess={fetchSamples}
+    onCreateSample={async (formData) => {
+      // Aqui você chamará `createSample` que você vai adaptar depois para aceitar FormData
+      await createSample(formData); // você vai adaptar isso depois
+    }}
+  />
+)}
 
     {/* POPUP DE EDIÇÃO DE AMOSTRA */}
-    {showEditPopup && !showingUsers && (
-      <div className="popup-overlay">
-        <div className="popup">
-          <h2>Editar Amostra</h2>
-          <input
-            type="text"
-            placeholder="Local da Amostra"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-          />
-          {/* data removida também */}
-          <input
-            type="number"
-            placeholder="pH"
-            value={ph}
-            onChange={(e) => setPh(e.target.value)}
-          />
-          <input
-            type="number"
-            placeholder="Profundidade (m)"
-            value={depth}
-            onChange={(e) => setDepth(e.target.value)}
-          />
-
-          {/* incluir os mesmos atributos na edição, se desejar */}
-          <input
-            type="text"
-            placeholder="Atributo 1"
-            value={atributo1}
-            onChange={(e) => setAtributo1(e.target.value)}
-          />
-          <input
-            type="number"
-            placeholder="Atributo 2"
-            value={atributo2}
-            onChange={(e) => setAtributo2(e.target.value)}
-          />
-          <input
-            type="number"
-            placeholder="Atributo 3"
-            value={atributo3}
-            onChange={(e) => setAtributo3(e.target.value)}
-          />
-
-          <div className="btn-container">
-            <button className="btn-green" onClick={handleEditSample}>
-              Salvar Alterações
-            </button>
-            <button className="btn-red" onClick={() => setShowEditPopup(false)}>
-              Cancelar
-            </button>
-          </div>
-        </div>
-      </div>
-    )}
+    {showEditPopup && editingSample && (
+        <SampleEditPopup
+          initialData={editingSample}
+          onClose={() => setShowEditPopup(false)}
+          onSubmit={handleEditSampleSubmit}
+        />
+      )}
 
     {/* POPUP DE EDIÇÃO DE USUÁRIO */}
     {showUserEditPopup && showingUsers && editingUser && (

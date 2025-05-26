@@ -3,13 +3,26 @@
 import api from "../services/api";
 
 interface SampleData {
+  user_id: number;
   location: string;
   ph: number;
   depth: number;
-  user_id: number;
-  atributo1?: string;
-  atributo2?: number | null;
-  atributo3?: number | null;
+  espacamento?: string;
+  arvore?: string;
+  porcentagem?: string;
+  observacao?: string;
+  espacamento2?: string;
+  altura?: string;
+  profundidade_info?: string;
+  vertice?: string;
+  talhao?: string;
+  parcela?: string;
+  tratamento?: string;
+  identificacao?: string;
+  ac?: string;
+  anexo1?: string; 
+  anexo2?: string;
+  metodologia?: number | null; 
 }
 
 export interface UserData {
@@ -19,15 +32,20 @@ export interface UserData {
   is_admin: boolean;
 }
 
+export interface MetodologiaData {
+  id: number;
+  nome: string;
+  material: string;
+  metodos: string;
+  referencias: string;
+  criado_em: string; 
+}
 
-export const createSample = async (data: SampleData) => {
-  try {
-    const response = await api.post("/sample/create/", data);
-    return response.data; 
-  } catch (error: any) {
-    console.error("Erro ao cadastrar amostra:", error.response?.data || error);
-    throw error.response?.data || "Erro desconhecido";
-  }
+
+export const createSample = async (formData: FormData) => {
+  return api.post("/sample/create/", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
 };
 
 export const getAllSamples = async () => {
@@ -52,14 +70,10 @@ export const deleteSample = async (ids: number[]) => {
   }
 };
 
-export const updateSample = async (id: number, updatedData: Partial<SampleData>) => {
-  try {
-    const response = await api.put(`/sample/update/${id}/`, updatedData);
-    return response.data;
-  } catch (error: any) {
-    console.error("Erro ao atualizar amostra:", error.response?.data || error);
-    throw error.response?.data || "Erro desconhecido";
-  }
+export const updateSample = async (id: number, formData: FormData) => {
+  return api.put(`/sample/update/${id}/`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
 };
 
 
@@ -125,5 +139,75 @@ export const searchSamplesByLocation = async (location: string) => {
   } catch (error: any) {
     console.error("Erro ao buscar amostras por localização:", error.response?.data || error);
     throw error.response?.data || "Erro ao buscar por localização";
+  }
+};
+
+// CREATE
+export const createMetodologia = async (data: MetodologiaData) => {
+  try {
+    const response = await api.post("/metodologia/create/", data);
+    return response.data;
+  } catch (error: any) {
+    console.error("Erro ao criar metodologia:", error.response?.data || error);
+    throw error.response?.data || "Erro desconhecido";
+  }
+};
+
+// LIST ALL
+export const getAllMetodologias = async () => {
+  try {
+    const response = await api.get("/metodologia/list/");
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao carregar metodologias:", error);
+    return [];
+  }
+};
+
+// GET DETAILS
+export const getMetodologiaDetails = async (id: number) => {
+  try {
+    const response = await api.get(`/metodologia/detail/${id}/`);
+    return response.data;
+  } catch (error: any) {
+    console.error("Erro ao buscar detalhes da metodologia:", error.response?.data || error);
+    throw error.response?.data || "Erro ao carregar detalhes";
+  }
+};
+
+// UPDATE
+export const updateMetodologia = async (id: number, updatedData: Partial<MetodologiaData>) => {
+  try {
+    const response = await api.put(`/metodologia/update/${id}/`, updatedData);
+    return response.data;
+  } catch (error: any) {
+    console.error("Erro ao atualizar metodologia:", error.response?.data || error);
+    throw error.response?.data || "Erro desconhecido";
+  }
+};
+
+// DELETE (múltiplas)
+export const deleteMetodologias = async (ids: number[]) => {
+  try {
+    const response = await api.delete("/metodologia/delete/", {
+      data: { ids },
+    });
+    return response.data;
+  } catch (error: any) {
+    console.error("Erro ao deletar metodologia(s):", error.response?.data || error);
+    throw error.response?.data || "Erro desconhecido";
+  }
+};
+
+// SEARCH BY MATERIAL
+export const searchMetodologiasByMaterial = async (material: string) => {
+  try {
+    const response = await api.get("/metodologia/search/material/", {
+      params: { material },
+    });
+    return response.data;
+  } catch (error: any) {
+    console.error("Erro ao buscar metodologias por material:", error.response?.data || error);
+    throw error.response?.data || "Erro ao buscar por material";
   }
 };
