@@ -2,7 +2,12 @@ import { Pencil, Trash2, Eye } from "lucide-react";
 
 interface Sample {
   id: number;
-  user: number;
+  user: {
+    id: number;
+    username: string;
+    email: string;
+    is_admin: boolean;
+  };
   location: string;
   ph: number;
   depth: number;
@@ -69,7 +74,7 @@ const SampleTable: React.FC<Props> = ({
           samples.map((sample) => (
             <tr key={sample.id}>
               <td>{sample.id}</td>
-              <td>{sample.user}</td>
+              <td>{sample.user?.username}</td>
               <td>{sample.location}</td>
               <td>{sample.ph}</td>
               <td>{sample.depth}m</td>

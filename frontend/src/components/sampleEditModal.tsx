@@ -1,5 +1,6 @@
 import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import "../css/menu_admin.css";
+import { getAllMetodologias } from "../controllers/sampleController";
 
 interface Props {
   initialData: any;
@@ -30,6 +31,8 @@ const SampleEditPopup: React.FC<Props> = ({ initialData, onClose, onSubmit }) =>
     anexo2: null as File | null,
   });
 
+  const [metodologias, setMetodologias] = useState<any[]>([]);
+
   useEffect(() => {
     setFormState({
       location: initialData.location || "",
@@ -48,11 +51,19 @@ const SampleEditPopup: React.FC<Props> = ({ initialData, onClose, onSubmit }) =>
       tratamento: initialData.tratamento || "",
       identificacao: initialData.identificacao || "",
       ac: initialData.ac || "",
-      metodologia: initialData.metodologia || "",
+      metodologia: initialData.metodologia?.id?.toString() || "",
       anexo1: null,
       anexo2: null,
     });
   }, [initialData]);
+
+  useEffect(() => {
+    async function fetchMetodologias() {
+      const data = await getAllMetodologias();
+      setMetodologias(data);
+    }
+    fetchMetodologias();
+  }, []);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -92,6 +103,23 @@ const SampleEditPopup: React.FC<Props> = ({ initialData, onClose, onSubmit }) =>
                 </div>
               );
             }
+
+            if (key === "metodologia") {
+              return (
+                <div className="form-group" key={key}>
+                  <label>Metodologia</label>
+                  <select name="metodologia" value={formState.metodologia} onChange={handleChange}>
+                    <option value="">Selecione uma metodologia</option>
+                    {metodologias.map((m) => (
+                      <option key={m.id} value={m.id}>
+                        {m.nome}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              );
+            }
+
             return (
               <div className="form-group" key={key}>
                 <label>{key}</label>

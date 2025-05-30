@@ -2,7 +2,7 @@
 
 import api from "../services/api";
 
-interface SampleData {
+/*interface SampleData {
   user_id: number;
   location: string;
   ph: number;
@@ -23,7 +23,7 @@ interface SampleData {
   anexo1?: string; 
   anexo2?: string;
   metodologia?: number | null; 
-}
+}*/
 
 export interface UserData {
   username: string;
@@ -41,10 +41,19 @@ export interface MetodologiaData {
   criado_em: string; 
 }
 
+export interface DiscoSampleData {
+  id: number;
+  parcelas: string;
+  quantidade: number;
+  porcentagem: string;
+  observacao?: string;
+  //metodologia: number;
+  criado_em: string;
+}
 
 export const createSample = async (formData: FormData) => {
   return api.post("/sample/create/", formData, {
-    headers: { "Content-Type": "multipart/form-data" },
+   
   });
 };
 
@@ -143,9 +152,13 @@ export const searchSamplesByLocation = async (location: string) => {
 };
 
 // CREATE
-export const createMetodologia = async (data: MetodologiaData) => {
+export const createMetodologia = async (formData: FormData) => {
   try {
-    const response = await api.post("/metodologia/create/", data);
+    const response = await api.post("/metodologia/create/", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data", 
+      },
+    });
     return response.data;
   } catch (error: any) {
     console.error("Erro ao criar metodologia:", error.response?.data || error);
@@ -156,7 +169,7 @@ export const createMetodologia = async (data: MetodologiaData) => {
 // LIST ALL
 export const getAllMetodologias = async () => {
   try {
-    const response = await api.get("/metodologia/list/");
+    const response = await api.get("/metodologia/listall/");
     return response.data;
   } catch (error) {
     console.error("Erro ao carregar metodologias:", error);
@@ -176,9 +189,13 @@ export const getMetodologiaDetails = async (id: number) => {
 };
 
 // UPDATE
-export const updateMetodologia = async (id: number, updatedData: Partial<MetodologiaData>) => {
+export const updateMetodologia = async (id: number, formData: FormData) => {
   try {
-    const response = await api.put(`/metodologia/update/${id}/`, updatedData);
+    const response = await api.put(`/metodologia/update/${id}/`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
     return response.data;
   } catch (error: any) {
     console.error("Erro ao atualizar metodologia:", error.response?.data || error);
@@ -209,5 +226,67 @@ export const searchMetodologiasByMaterial = async (material: string) => {
   } catch (error: any) {
     console.error("Erro ao buscar metodologias por material:", error.response?.data || error);
     throw error.response?.data || "Erro ao buscar por material";
+  }
+};
+
+////////////////////////////////DISCSAMPLES//////////////////////////////////
+// CREATE
+export const createDiscoSample = async (formData: FormData) => {
+  try {
+    const response = await api.post("/discsamples/create/", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return response.data;
+  } catch (error: any) {
+    console.error("Erro ao criar DiscoSample:", error.response?.data || error);
+    throw error.response?.data || "Erro desconhecido";
+  }
+};
+
+// LIST ALL
+export const getAllDiscoSamples = async () => {
+  try {
+    const response = await api.get("/discsamples/list/");
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao carregar DiscoSamples:", error);
+    return [];
+  }
+};
+
+// GET DETAILS
+export const getDiscSampleDetails = async (id: number) => {
+  try {
+    const response = await api.get(`/discsamples/detail/${id}/`);
+    return response.data;
+  } catch (error: any) {
+    console.error("Erro ao buscar detalhes do DiscoSample:", error.response?.data || error);
+    throw error.response?.data || "Erro ao carregar detalhes";
+  }
+};
+
+// UPDATE
+export const updateDiscoSample = async (id: number, formData: FormData) => {
+  try {
+    const response = await api.put(`/discsamples/update/${id}/`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return response.data;
+  } catch (error: any) {
+    console.error("Erro ao atualizar DiscoSample:", error.response?.data || error);
+    throw error.response?.data || "Erro desconhecido";
+  }
+};
+
+// DELETE (múltiplas)
+export const deleteDiscoSamples = async (ids: number[]) => {
+  try {
+    const response = await api.delete("/discsamples/delete/", {
+      data: { ids },
+    });
+    return response.data;
+  } catch (error: any) {
+    console.error("Erro ao deletar DiscoSample(s):", error.response?.data || error);
+    throw error.response?.data || "Erro desconhecido";
   }
 };

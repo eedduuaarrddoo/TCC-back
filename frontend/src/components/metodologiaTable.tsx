@@ -16,7 +16,13 @@ interface SortConfig {
   direction: "asc" | "desc";
 }
 
-const MetodologiaList: React.FC = () => {
+interface Props {
+  onEdit: (metodologia: MetodologiaData) => void;
+  onView?: (metodologia: MetodologiaData) => void;
+  onDelete?: (id: number) => void;
+}
+
+const MetodologiaList: React.FC<Props> = ({ onEdit, onView, onDelete }) => {
   const [metodologias, setMetodologias] = useState<MetodologiaData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -58,21 +64,6 @@ const MetodologiaList: React.FC = () => {
     return sortConfig.direction === "asc" ? "▲" : "▼";
   };
 
-  const onView = (m: MetodologiaData) => {
-    // lógica para ver detalhes
-    console.log("Ver detalhes:", m);
-  };
-
-  const onEdit = (m: MetodologiaData) => {
-    // lógica para editar
-    console.log("Editar:", m);
-  };
-
-  const onDelete = (id: number) => {
-    // lógica para deletar
-    console.log("Deletar ID:", id);
-  };
-
   if (loading) return <p>Carregando metodologias...</p>;
   if (error) return <p>{error}</p>;
 
@@ -109,13 +100,19 @@ const MetodologiaList: React.FC = () => {
                 <td>{new Date(m.criado_em).toLocaleString()}</td>
                 <td>
                   <div className="action-buttons">
-                    <button onClick={() => onView(m)} className="btn-icon" title="Ver Detalhes">
-                      <Eye size={20} />
-                    </button>
-                    <button onClick={() => onEdit(m)} className="btn-icon" title="Editar Metodologia">
+                   
+                    <button
+                      onClick={() => onEdit(m)}
+                      className="btn-icon"
+                      title="Editar Metodologia"
+                    >
                       <Pencil size={20} />
                     </button>
-                    <button onClick={() => onDelete(m.id)} className="btn-icon" title="Deletar Metodologia">
+                    <button
+                      onClick={() => onDelete?.(m.id)}
+                      className="btn-icon"
+                      title="Deletar Metodologia"
+                    >
                       <Trash2 size={20} />
                     </button>
                   </div>

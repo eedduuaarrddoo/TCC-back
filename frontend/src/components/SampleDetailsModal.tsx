@@ -1,6 +1,7 @@
 import { jsPDF } from 'jspdf';
 import { FileText, X } from 'lucide-react';
 
+
 interface SampleDetailsProps {
   sample: {
     id: number;
@@ -10,7 +11,7 @@ interface SampleDetailsProps {
     depth: number;
     created_at: string;
     updated_at?: string;
-    metodologia?: any;
+    metodologia: { id: number; nome: string };
     espacamento?: string;
     arvore?: string;
     porcentagem?: string;
@@ -54,7 +55,7 @@ const SampleDetailsModal: React.FC<SampleDetailsProps> = ({ sample, onClose }) =
     { label: 'Anexo 2', value: sample.anexo2 },
     { label: 'Data de Criação', value: new Date(sample.created_at).toLocaleDateString('pt-BR') },
     { label: 'Última Atualização', value: sample.updated_at ? new Date(sample.updated_at).toLocaleDateString('pt-BR') : undefined },
-    { label: 'Metodologia', value: sample.metodologia?.nome },
+    { label: 'Metodologia', value: `${sample.metodologia.nome} (ID: ${sample.metodologia.id})` },
   ];
 
   const camposVisiveis = campos.filter(campo => campo.value !== null && campo.value !== undefined && campo.value !== "");

@@ -9,7 +9,16 @@ import {
   editUser,
   getSampleDetails,
   getUserSamplesIds,
-  searchSamplesByLocation
+  searchSamplesByLocation,
+  getAllMetodologias,
+  createMetodologia,
+  updateMetodologia,
+  getAllDiscoSamples,
+  createDiscoSample,
+  DiscoSampleData,
+  updateDiscoSample,
+  deleteDiscoSamples,
+  deleteMetodologias
 } from "../controllers/sampleController";
 import SampleTable from "../components/SampleTable";
 import UserTable from "../components/UserTable";
@@ -17,6 +26,13 @@ import "../css/menu_admin.css";
 import SampleDetailsModal from "../components/SampleDetailsModal";
 import SampleCreatePopup from "../components/SampleCreatePopup";
 import SampleEditPopup from "../components/sampleEditModal";
+import MetodologiaList, { MetodologiaData } from "../components/metodologiaTable";
+import MetodologiaCreatePopup from "../components/createMetodologiapopup";
+import MetodologiaEditPopup from "../components/metodologiaEditpopup";
+import DiscoSampleTable from "../components/discSamplesTable";
+import DiscoSampleCreatePopup from "../components/createDiscSamplesModal";
+import DiscoSampleEditPopup from "../components/editDiscSamplesmodal";
+
 
 const MenuAdmin = () => {
   const [userName, setUserName] = useState<string | null>(null);
@@ -37,6 +53,16 @@ const MenuAdmin = () => {
   const [userSamplesIds, setUserSamplesIds] = useState<number[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [showCreatePopup, setShowCreatePopup] = useState(false);
+  const [showingMetodologias, setShowingMetodologias] = useState(false);
+  const [showCreateMetodologiaPopup, setShowCreateMetodologiaPopup] = useState(false);
+  const [editingMetodologia, setEditingMetodologia] = useState<MetodologiaData | null>(null);
+  const [showEditMetodologiaPopup, setShowEditMetodologiaPopup] = useState(false);
+  const [showingDiscoSamples, setShowingDiscoSamples] = useState(false);
+  const [discoSamples, setDiscoSamples] = useState<any[]>([]);
+  const [showCreateDiscoSamplePopup, setShowCreateDiscoSamplePopup] = useState(false);
+  const [showEditDiscoSamplePopup, setShowEditDiscoSamplePopup] = useState(false);
+  const [editingDiscoSample, setEditingDiscoSample] = useState<DiscoSampleData | null>(null);
+
   useEffect(() => {
     const storedUserName = localStorage.getItem("username");
     if (storedUserName) setUserName(storedUserName);
@@ -61,8 +87,23 @@ const MenuAdmin = () => {
       console.error("Erro ao buscar usuários", error);
     }
   };
+  const fetchMetodologias = async () => {
+    try {
+      const data = await getAllMetodologias();
+      setUsers(data);
+    } catch (error) {
+      console.error("Erro ao buscar usuários", error);
+    }
+  };
 
-  
+  const fetchDiscoSamples = async () => {
+  try {
+    const data = await getAllDiscoSamples();
+    setDiscoSamples(data);
+  } catch (error) {
+    console.error("Erro ao carregar amostras de disco:", error);
+  }
+};
    
      
   const handleDeleteSample = async (id: number) => {
@@ -204,7 +245,58 @@ const handleSearch = async () => {
   }
 };
 
+const startEditMetodologia = (metodologia: MetodologiaData) => {
+  setEditingMetodologia(metodologia);
+  setShowEditMetodologiaPopup(true);
+};
+const handleEditMetodologiaSubmit = async (formData: FormData) => {
+  if (!editingMetodologia) return;
 
+  try {
+    await updateMetodologia(editingMetodologia.id, formData);
+    alert("Metodologia atualizada com sucesso!");
+    setShowEditMetodologiaPopup(false);
+    setEditingMetodologia(null);
+    fetchMetodologias();
+  } catch (error) {
+    console.error("Erro ao atualizar metodologia:", error);
+    alert("Erro ao atualizar metodologia.");
+  }
+};
+
+const startEditDiscoSample = (sample: DiscoSampleData) => {
+  setEditingDiscoSample(sample);
+  setShowEditDiscoSamplePopup(true);
+  fetchMetodologias();  // se precisar do dropdown atualizado
+};
+
+const handleDeleteDiscoSample = async (id: number) => {
+  const confirmar = window.confirm("Tem certeza que deseja excluir este disco?");
+  if (!confirmar) return;
+
+  try {
+    await deleteDiscoSamples([id]);
+    alert("Disco deletado com sucesso!");
+    fetchDiscoSamples(); // atualiza a tabela
+  } catch (error) {
+    console.error("Erro ao deletar disco:", error);
+    alert("Erro ao deletar o disco.");
+  }
+};
+
+const handleDeleteMetodologia = async (id: number) => {
+  const confirmar = window.confirm("Tem certeza que deseja excluir esta metodologia?");
+  if (!confirmar) return;
+
+  try {
+    await deleteMetodologias([id]);
+    alert("Metodologia deletada com sucesso!");
+    fetchMetodologias(); // recarrega lista atualizada
+  } catch (error) {
+    console.error("Erro ao deletar metodologia:", error);
+    alert("Erro ao deletar a metodologia.");
+  }
+};
 
   return (
   <div className="page-container">
@@ -218,6 +310,8 @@ const handleSearch = async () => {
             className="btn-blue"
             onClick={() => {
               setShowingUsers(false);
+              setShowingMetodologias(false);
+              setShowingDiscoSamples(false);
               fetchSamples();
             }}
           >
@@ -227,11 +321,35 @@ const handleSearch = async () => {
             className="btn-purple"
             onClick={() => {
               setShowingUsers(true);
+              setShowingMetodologias(false);
+              setShowingDiscoSamples(false);
               fetchUsers();
             }}
           >
             Ver Usuários
           </button>
+          <button
+    className="btn-orange"
+    onClick={() => {
+      setShowingDiscoSamples(false);
+      setShowingUsers(false);
+      setShowingMetodologias(true);
+      fetchMetodologias ();
+    }}
+  >
+    Ver Metodologias
+  </button>
+  <button
+  className="btn-dark"
+  onClick={() => {
+    setShowingUsers(false);
+    setShowingMetodologias(false);
+    setShowingDiscoSamples(true);
+    fetchDiscoSamples();
+  }}
+>
+  Ver Amostras de Disco
+</button>
         </div>
       </div>
   <div style={{ display: "flex", alignItems: "center", marginBottom: "10px" }}>
@@ -262,26 +380,56 @@ const handleSearch = async () => {
       🔍
     </button>
   </div>
-      {showingUsers ? (
-        <UserTable
-          users={users}
-          onEdit={startEditUser}
-          onDelete={handleDeleteUser}
-          onViewSamples={handleGetUserSamples}
-          userSamplesIds={userSamplesIds}
-          selectedUserId={selectedUserId}
-          onSelectSample={handleSelectSample}
-        />
-      ) : (
-        <>
-          <SampleTable
-            samples={sortedSamples}
-            sortConfig={sortConfig}
-            onSort={handleSort}
-            onEdit={startEditSample}
-            onDelete={handleDeleteSample}
-            onView={handleViewSample}
-          />
+      {showingMetodologias ? (
+  <>
+    <MetodologiaList 
+    onEdit={startEditMetodologia} 
+    onDelete={handleDeleteMetodologia}
+    />
+    <div className="btn-group">
+      <button className="btn-blue" onClick={() => setShowCreateMetodologiaPopup(true)}>
+        Cadastrar Metodologia
+      </button>
+    </div>
+  </>
+): showingDiscoSamples ? (
+  <>
+    <DiscoSampleTable
+      onEdit={startEditDiscoSample}
+      onDelete={handleDeleteDiscoSample}
+    />
+    <div className="btn-group">
+      <button className="btn-blue"  onClick={() => {
+    setShowCreateDiscoSamplePopup(true);
+    fetchDiscoSamples();
+    }}>
+        Cadastrar Amostra de Disco
+      </button>
+      <button className="btn-green" onClick={fetchDiscoSamples}>
+        Atualizar Lista
+      </button>
+    </div>
+  </>
+) : showingUsers ? (
+  <UserTable
+    users={users}
+    onEdit={startEditUser}
+    onDelete={handleDeleteUser}
+    onViewSamples={handleGetUserSamples}
+    userSamplesIds={userSamplesIds}
+    selectedUserId={selectedUserId}
+    onSelectSample={handleSelectSample}
+  />
+) : (
+  <>
+    <SampleTable
+      samples={sortedSamples}
+      sortConfig={sortConfig}
+      onSort={handleSort}
+      onEdit={startEditSample}
+      onDelete={handleDeleteSample}
+      onView={handleViewSample}
+    />
           <div className="btn-group">
             <button className="btn-blue" onClick={() => setShowCreatePopup(true)}>
                       Cadastrar Amostra
@@ -306,6 +454,15 @@ const handleSearch = async () => {
   />
 )}
 
+{showCreateMetodologiaPopup && (
+  <MetodologiaCreatePopup
+    onClose={() => setShowCreateMetodologiaPopup(false)}
+    onSubmitSuccess={fetchMetodologias}
+    onCreateMetodologia={async (formData) => {
+      await createMetodologia(formData);
+    }}
+  />
+)}
     {/* POPUP DE EDIÇÃO DE AMOSTRA */}
     {showEditPopup && editingSample && (
         <SampleEditPopup
@@ -352,6 +509,13 @@ const handleSearch = async () => {
       </div>
     )}
 
+    {showEditMetodologiaPopup && editingMetodologia && (
+  <MetodologiaEditPopup
+    initialData={editingMetodologia}
+    onClose={() => setShowEditMetodologiaPopup(false)}
+    onSubmit={handleEditMetodologiaSubmit}
+  />
+)}
     {/* MODAL DE DETALHES */}
     {showDetailsPopup && selectedSample && (
       <SampleDetailsModal
@@ -362,6 +526,36 @@ const handleSearch = async () => {
         }}
       />
     )}
+    {showCreateDiscoSamplePopup && (
+  <DiscoSampleCreatePopup
+    onClose={() => setShowCreateDiscoSamplePopup(false)}
+    onSubmitSuccess={fetchDiscoSamples}
+    onCreateDiscoSample={async (formData) => {
+      await createDiscoSample(formData);
+    }}
+    //metodologias={metodologias}
+  />
+)}
+
+
+{showEditDiscoSamplePopup && editingDiscoSample && (
+  <DiscoSampleEditPopup
+    discoSample={editingDiscoSample}
+    //metodologias={metodologias}
+    onClose={() => {
+      setShowEditDiscoSamplePopup(false);
+      setEditingDiscoSample(null);
+    }}
+    onSubmitSuccess={() => {
+      setShowEditDiscoSamplePopup(false);
+      setEditingDiscoSample(null);
+      fetchDiscoSamples();
+    }}
+    onUpdateDiscoSample={async (id, formData) => {
+      await updateDiscoSample(id, formData);
+    }}
+  />
+)}
   </div>
 );
 

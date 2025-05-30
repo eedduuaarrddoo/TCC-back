@@ -1,10 +1,17 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from metodologia.models import Metodologia
+import uuid
+import os
 
 User = get_user_model()
+def sample_upload_path(instance, filename):
+    ext = filename.split('.')[-1]
+    new_filename = f"{uuid.uuid4()}.{ext}"
+    return f"samples/anexos/{instance.user.id}/{new_filename}"
 
 class Sample(models.Model):
+    
     user = models.ForeignKey(User, on_delete=models.CASCADE)  # Relaciona a amostra ao usuário que a cadastrou
     location = models.CharField(max_length=255)  # Local da amostra
    
@@ -26,8 +33,8 @@ class Sample(models.Model):
     tratamento = models.CharField(max_length=255, null=True, blank=True)
     identificacao = models.CharField(max_length=255, null=True, blank=True)
     ac = models.CharField(max_length=255, null=True, blank=True)
-    anexo1 = models.CharField(max_length=255, null=True, blank=True)
-    anexo2 = models.CharField(max_length=255, null=True, blank=True)
+    anexo1 = models.FileField(upload_to=sample_upload_path, null=True, blank=True)
+    anexo2 = models.FileField(upload_to=sample_upload_path, null=True, blank=True)
     
 
     def __str__(self):

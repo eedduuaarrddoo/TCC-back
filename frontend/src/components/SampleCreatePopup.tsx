@@ -1,6 +1,6 @@
-// src/components/SampleCreatePopup.tsx
-import { useState } from "react";
-import "../css/sampleform.css"; // ajuste aqui para apontar para seu CSS
+import { useEffect, useState } from "react";
+import "../css/sampleform.css";
+import { getAllMetodologias } from "../controllers/sampleController";
 
 interface SampleCreatePopupProps {
   onClose: () => void;
@@ -12,7 +12,6 @@ const SampleCreatePopup = ({ onClose, onSubmitSuccess, onCreateSample }: SampleC
   const [location, setLocation] = useState("");
   const [ph, setPh] = useState("");
   const [depth, setDepth] = useState("");
-
   const [spacamento, setSpacamento] = useState("");
   const [espacamento2, setEspacamento2] = useState("");
   const [arvore, setArvore] = useState("");
@@ -26,9 +25,19 @@ const SampleCreatePopup = ({ onClose, onSubmitSuccess, onCreateSample }: SampleC
   const [tratamento, setTratamento] = useState("");
   const [identificacao, setIdentificacao] = useState("");
   const [ac, setAc] = useState("");
-
   const [anexo1, setAnexo1] = useState<File | null>(null);
   const [anexo2, setAnexo2] = useState<File | null>(null);
+
+  const [metodologias, setMetodologias] = useState<{ id: number; nome: string }[]>([]);
+  const [selectedMetodologia, setSelectedMetodologia] = useState("");
+
+  useEffect(() => {
+    async function fetchMetodologias() {
+      const data = await getAllMetodologias();
+      setMetodologias(data);
+    }
+    fetchMetodologias();
+  }, []);
 
   const handleSubmit = async () => {
     const storedUserID = localStorage.getItem("user_id");
@@ -38,7 +47,6 @@ const SampleCreatePopup = ({ onClose, onSubmitSuccess, onCreateSample }: SampleC
     }
 
     const formData = new FormData();
-    formData.append("user_id", storedUserID);
     formData.append("location", location);
     formData.append("ph", ph);
     formData.append("depth", depth);
@@ -55,9 +63,15 @@ const SampleCreatePopup = ({ onClose, onSubmitSuccess, onCreateSample }: SampleC
     formData.append("tratamento", tratamento);
     formData.append("identificacao", identificacao);
     formData.append("ac", ac);
+    formData.append("user_id", storedUserID); // se precisar enviar usuário
 
     if (anexo1) formData.append("anexo1", anexo1);
     if (anexo2) formData.append("anexo2", anexo2);
+
+    if (selectedMetodologia) {
+     
+       formData.append("metodologia_id", selectedMetodologia);
+    }
 
     try {
       await onCreateSample(formData);
@@ -90,6 +104,7 @@ const SampleCreatePopup = ({ onClose, onSubmitSuccess, onCreateSample }: SampleC
         <input type="text" placeholder="Tratamento" value={tratamento} onChange={e => setTratamento(e.target.value)} />
         <input type="text" placeholder="Identificação" value={identificacao} onChange={e => setIdentificacao(e.target.value)} />
         <input type="text" placeholder="AC" value={ac} onChange={e => setAc(e.target.value)} />
+
         <div>
           <label>Anexo 1:</label>
           <input type="file" onChange={e => setAnexo1(e.target.files?.[0] || null)} />
@@ -98,6 +113,13 @@ const SampleCreatePopup = ({ onClose, onSubmitSuccess, onCreateSample }: SampleC
           <label>Anexo 2:</label>
           <input type="file" onChange={e => setAnexo2(e.target.files?.[0] || null)} />
         </div>
+
+        <select value={selectedMetodologia} onChange={e => setSelectedMetodologia(e.target.value)}>
+          <option value="">Selecione a Metodologia</option>
+          {metodologias.map((m) => (
+            <option key={m.id} value={m.id}>{m.nome}</option>
+          ))}
+        </select>
 
         <div className="btn-container">
           <button className="btn-blue" onClick={handleSubmit}>Cadastrar</button>
