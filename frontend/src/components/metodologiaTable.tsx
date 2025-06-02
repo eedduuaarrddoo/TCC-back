@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Eye, Pencil, Trash2 } from "lucide-react";
-import { getAllMetodologias } from "../controllers/sampleController";
+import { Table2, Pencil, Trash2 } from "lucide-react";
+import { getAllMetodologias, getSamplesByMetodologia } from "../controllers/sampleController";
+import jsPDF from "jspdf";
+//import autoTable from "jspdf-autotable";
+import "../css/menu_admin.css";
 
 export interface MetodologiaData {
   id: number;
@@ -67,6 +70,55 @@ const MetodologiaList: React.FC<Props> = ({ onEdit, onView, onDelete }) => {
   if (loading) return <p>Carregando metodologias...</p>;
   if (error) return <p>{error}</p>;
 
+const handleGeneratePdf = async (metodologia: MetodologiaData) => {
+  try {
+    const samples = await getSamplesByMetodologia(metodologia.id);
+
+    if (!samples || samples.length === 0) {
+      alert("Nenhuma amostra encontrada para essa metodologia.");
+      return;
+    }
+
+    // 1. Obter todos os campos únicos existentes nas amostras
+    const uniqueFields = new Set<string>();
+    samples.forEach((sample: any) => {
+      Object.keys(sample).forEach((key) => uniqueFields.add(key));
+    });
+
+    const columns = Array.from(uniqueFields);
+
+    // 2. Montar os dados da tabela com todas as colunas possíveis
+    const tableData = samples.map((sample: any) => {
+      return columns.map((col) => {
+        const value = sample[col];
+
+        if (typeof value === "object" && value !== null) {
+          return JSON.stringify(value);
+        }
+
+        return value !== undefined && value !== null ? String(value) : "";
+      });
+    });
+
+    // 3. Criar o PDF
+    const doc = new jsPDF();
+    doc.text(`Amostras da Metodologia: ${metodologia.nome}`, 14, 15);
+
+    autoTable(doc, {
+      startY: 20,
+      head: [columns],
+      body: tableData,
+      styles: { fontSize: 8 },
+      headStyles: { fillColor: [41, 128, 185] }, // azul escuro
+    });
+
+    doc.save(`amostras_metodologia_${metodologia.id}.pdf`);
+  } catch (err) {
+    alert("Erro ao gerar PDF");
+    console.error(err);
+  }
+};
+
   return (
     <div className="metodologia-list">
       <h2>Lista de Metodologias</h2>
@@ -115,6 +167,15 @@ const MetodologiaList: React.FC<Props> = ({ onEdit, onView, onDelete }) => {
                     >
                       <Trash2 size={20} />
                     </button>
+
+                      <button
+                         onClick={() => handleGeneratePdf(m)} 
+                        className="btn-icon"
+                        title="Ver Dados da Tabela"
+                      >
+                      <Table2 size={20} />
+                      </button>
+
                   </div>
                 </td>
               </tr>

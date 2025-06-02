@@ -47,7 +47,7 @@ export interface DiscoSampleData {
   quantidade: number;
   porcentagem: string;
   observacao?: string;
-  //metodologia: number;
+   metodologia: { id: number; nome: string };
   criado_em: string;
 }
 
@@ -67,17 +67,16 @@ export const getAllSamples = async () => {
   }
 };
 
-export const deleteSample = async (ids: number[]) => {
+export const deleteSample = async (id: number) => {
   try {
-    const response = await api.delete("/sample/delete/", {
-      data: { ids }, // Envia a lista de IDs no corpo da requisição
-    });
+    const response = await api.delete(`/sample/delete/${id}/`);
     return response.data;
   } catch (error: any) {
-    console.error("Erro ao deletar amostra(s):", error.response?.data || error);
+    console.error("Erro ao deletar amostra:", error.response?.data || error);
     throw error.response?.data || "Erro desconhecido";
   }
 };
+
 
 export const updateSample = async (id: number, formData: FormData) => {
   return api.put(`/sample/update/${id}/`, formData, {
@@ -139,18 +138,20 @@ export const getUserSamplesIds = async (userId: number): Promise<number[]> => {
   }
 };
 
-export const searchSamplesByLocation = async (location: string) => {
+export const searchSamplesByLocation = async (location: string, metodologiaId: string) => {
   try {
     const response = await api.get(`/sample/search/location/`, {
-      params: { location }, // Envia o parâmetro de busca via query string
+      params: {
+        location,
+        metodologia_id: metodologiaId,
+      },
     });
-    return response.data; // Retorna a lista de amostras encontradas
+    return response.data;
   } catch (error: any) {
     console.error("Erro ao buscar amostras por localização:", error.response?.data || error);
     throw error.response?.data || "Erro ao buscar por localização";
   }
 };
-
 // CREATE
 export const createMetodologia = async (formData: FormData) => {
   try {
@@ -217,10 +218,13 @@ export const deleteMetodologias = async (ids: number[]) => {
 };
 
 // SEARCH BY MATERIAL
-export const searchMetodologiasByMaterial = async (material: string) => {
+export const searchMetodologiasByMaterial = async (material: string, metodologiaId: string) => {
   try {
     const response = await api.get("/metodologia/search/material/", {
-      params: { material },
+      params: {
+        material,
+        metodologia_id: metodologiaId,
+      },
     });
     return response.data;
   } catch (error: any) {
@@ -288,5 +292,15 @@ export const deleteDiscoSamples = async (ids: number[]) => {
   } catch (error: any) {
     console.error("Erro ao deletar DiscoSample(s):", error.response?.data || error);
     throw error.response?.data || "Erro desconhecido";
+  }
+};
+
+export const getSamplesByMetodologia = async (metodologiaId: number) => {
+  try {
+    const response = await api.get(`/sample/metodologia/${metodologiaId}/samples/`);
+    return response.data;
+  } catch (error: any) {
+    console.error("Erro ao buscar amostras da metodologia:", error.response?.data || error);
+    throw error.response?.data || "Erro ao buscar amostras da metodologia";
   }
 };

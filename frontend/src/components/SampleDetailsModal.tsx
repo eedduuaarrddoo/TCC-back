@@ -55,7 +55,7 @@ const SampleDetailsModal: React.FC<SampleDetailsProps> = ({ sample, onClose }) =
     { label: 'Anexo 2', value: sample.anexo2 },
     { label: 'Data de Criação', value: new Date(sample.created_at).toLocaleDateString('pt-BR') },
     { label: 'Última Atualização', value: sample.updated_at ? new Date(sample.updated_at).toLocaleDateString('pt-BR') : undefined },
-    { label: 'Metodologia', value: `${sample.metodologia.nome} (ID: ${sample.metodologia.id})` },
+    { label: 'Metodologia', value: sample.metodologia ? `${sample.metodologia.nome} (ID: ${sample.metodologia.id})` : "Sem metodologia" },
   ];
 
   const camposVisiveis = campos.filter(campo => campo.value !== null && campo.value !== undefined && campo.value !== "");

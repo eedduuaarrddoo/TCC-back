@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Eye, Pencil, Trash2 } from "lucide-react";
 import { getAllDiscoSamples } from "../controllers/sampleController";
 import "../css/menu_admin.css";
+
 export interface DiscoSampleData {
   id: number;
   parcelas: string;

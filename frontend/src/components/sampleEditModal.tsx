@@ -78,16 +78,25 @@ const SampleEditPopup: React.FC<Props> = ({ initialData, onClose, onSubmit }) =>
   };
 
   const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    const formData = new FormData();
-    for (const key in formState) {
-      const value = (formState as any)[key];
-      if (value !== null) {
-        formData.append(key, value);
-      }
+  e.preventDefault();
+  const formData = new FormData();
+
+  for (const key in formState) {
+    let value = (formState as any)[key];
+
+    // Enviar como metodologia_id (convertido em int)
+    if (key === "metodologia" && value !== "") {
+      formData.append("metodologia_id", value.toString()); 
+      continue; 
     }
-    onSubmit(formData);
-  };
+
+    if (value !== null && value !== "") {
+      formData.append(key, value);
+    }
+  }
+
+  onSubmit(formData);
+};
 
   return (
     <div className="popup-overlay">
@@ -108,14 +117,14 @@ const SampleEditPopup: React.FC<Props> = ({ initialData, onClose, onSubmit }) =>
               return (
                 <div className="form-group" key={key}>
                   <label>Metodologia</label>
-                  <select name="metodologia" value={formState.metodologia} onChange={handleChange}>
-                    <option value="">Selecione uma metodologia</option>
-                    {metodologias.map((m) => (
-                      <option key={m.id} value={m.id}>
-                        {m.nome}
-                      </option>
-                    ))}
-                  </select>
+                 <select name="metodologia" value={formState.metodologia} onChange={handleChange}>
+  <option value="">Selecione uma metodologia</option>
+  {metodologias.map((m) => (
+    <option key={m.id} value={m.id.toString()}>
+      {m.nome}
+    </option>
+  ))}
+</select>
                 </div>
               );
             }

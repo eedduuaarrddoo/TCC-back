@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "../css/menu_admin.css";
+import { getAllMetodologias } from "../controllers/sampleController";
 
 interface DiscoSample {
   id: number;
@@ -7,7 +8,7 @@ interface DiscoSample {
   quantidade: number;
   porcentagem: string;
   observacao?: string;
-  //metodologia: number;
+  metodologia: { id: number; nome: string };
 }
 
 interface Metodologia {
@@ -25,7 +26,7 @@ interface DiscoSampleEditPopupProps {
 
 const DiscoSampleEditPopup: React.FC<DiscoSampleEditPopupProps> = ({
   discoSample,
-  //metodologias,
+
   onClose,
   onSubmitSuccess,
   onUpdateDiscoSample,
@@ -34,28 +35,46 @@ const DiscoSampleEditPopup: React.FC<DiscoSampleEditPopupProps> = ({
   const [quantidade, setQuantidade] = useState(discoSample.quantidade);
   const [porcentagem, setPorcentagem] = useState(discoSample.porcentagem);
   const [observacao, setObservacao] = useState(discoSample.observacao || "");
-  //const [metodologiaId, setMetodologiaId] = useState<number>(discoSample.metodologia);
-
+  const [metodologiaId, setMetodologiaId] = useState<number | undefined>(
+  discoSample.metodologia?.id
+);
+  const [metodologias, setMetodologias] = useState<Metodologia[]>([]);
+  
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    const formData = new FormData();
-    formData.append("parcelas", parcelas);
-    formData.append("quantidade", quantidade.toString());
-    formData.append("porcentagem", porcentagem);
-    formData.append("observacao", observacao);
-    //formData.append("metodologia", metodologiaId.toString());
+  const formData = new FormData();
+  formData.append("parcelas", parcelas);
+  formData.append("quantidade", quantidade.toString());
+  formData.append("porcentagem", porcentagem);
+  formData.append("observacao", observacao);
 
-    try {
-      await onUpdateDiscoSample(discoSample.id, formData);
-      alert("DiscoSample atualizada com sucesso!");
-      onSubmitSuccess();
-      onClose();
-    } catch (error) {
-      console.error("Erro ao atualizar DiscoSample:", error);
-      alert("Erro ao atualizar DiscoSample.");
-    }
-  };
+  if (typeof metodologiaId === "number") {
+    formData.append("metodologia_id", metodologiaId.toString()); 
+  } else {
+    alert("Por favor, selecione uma metodologia.");
+    return;
+  }
+
+  try {
+    await onUpdateDiscoSample(discoSample.id, formData);
+    alert("DiscoSample atualizada com sucesso!");
+    onSubmitSuccess();
+    onClose();
+  } catch (error) {
+    console.error("Erro ao atualizar DiscoSample:", error);
+    alert("Erro ao atualizar DiscoSample.");
+  }
+};
+
+
+  useEffect(() => {
+  async function fetchMetodologias() {
+    const data = await getAllMetodologias();
+    setMetodologias(data);
+  }
+  fetchMetodologias();
+}, []);
 
   return (
     <div className="popup-overlay">
@@ -88,18 +107,20 @@ const DiscoSampleEditPopup: React.FC<DiscoSampleEditPopupProps> = ({
             value={observacao}
             onChange={(e) => setObservacao(e.target.value)}
           />
-         {/* <select
-            value={metodologiaId}
-            onChange={(e) => setMetodologiaId(Number(e.target.value))}
-            required
-          >
-            <option value="">Selecione uma Metodologia</option>
-            {metodologias.map((m) => (
-              <option key={m.id} value={m.id}>
-                {m.nome}
-              </option>
-            ))}
-          </select>*/ }
+           <select
+  value={metodologiaId ?? ""}
+  onChange={(e) =>
+    setMetodologiaId(e.target.value ? Number(e.target.value) : undefined)
+  }
+  required
+>
+  <option value="">Selecione uma Metodologia</option>
+  {metodologias.map((m) => (
+    <option key={m.id} value={m.id}>
+      {m.nome}
+    </option>
+  ))}
+</select> 
           <div className="btn-container">
             <button type="submit" className="btn-green">Salvar</button>
             <button type="button" className="btn-red" onClick={onClose}>Cancelar</button>

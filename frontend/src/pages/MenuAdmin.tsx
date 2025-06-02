@@ -18,7 +18,8 @@ import {
   DiscoSampleData,
   updateDiscoSample,
   deleteDiscoSamples,
-  deleteMetodologias
+  deleteMetodologias,
+  
 } from "../controllers/sampleController";
 import SampleTable from "../components/SampleTable";
 import UserTable from "../components/UserTable";
@@ -62,11 +63,14 @@ const MenuAdmin = () => {
   const [showCreateDiscoSamplePopup, setShowCreateDiscoSamplePopup] = useState(false);
   const [showEditDiscoSamplePopup, setShowEditDiscoSamplePopup] = useState(false);
   const [editingDiscoSample, setEditingDiscoSample] = useState<DiscoSampleData | null>(null);
+  const [metodologiasList, setMetodologiasList] = useState<MetodologiaData[]>([]);
+
 
   useEffect(() => {
     const storedUserName = localStorage.getItem("username");
     if (storedUserName) setUserName(storedUserName);
     fetchSamples();
+    fetchMetodologias();
   }, []);
 
   const fetchSamples = async () => {
@@ -88,13 +92,13 @@ const MenuAdmin = () => {
     }
   };
   const fetchMetodologias = async () => {
-    try {
-      const data = await getAllMetodologias();
-      setUsers(data);
-    } catch (error) {
-      console.error("Erro ao buscar usuários", error);
-    }
-  };
+  try {
+    const data = await getAllMetodologias();
+    setMetodologiasList(data); // Armazena na variável correta
+  } catch (error) {
+    console.error("Erro ao buscar metodologias", error);
+  }
+};
 
   const fetchDiscoSamples = async () => {
   try {
@@ -106,22 +110,23 @@ const MenuAdmin = () => {
 };
    
      
-  const handleDeleteSample = async (id: number) => {
-    const confirmar = window.confirm(`Tem certeza que deseja excluir a amostra ${id}?`);
-    if (!confirmar) return;
+ const handleDeleteSample = async (id: number) => {
+  const confirmar = window.confirm(`Tem certeza que deseja excluir a amostra ${id}?`);
+  if (!confirmar) return;
 
-    try {
-      await deleteSample([id]);
-      alert("Amostra deletada com sucesso.");
-      fetchSamples();
-    } catch (error) {
-      console.error("Erro ao deletar amostra", error);
-      alert("Erro ao deletar a amostra.");
-    }
-  };
+  try {
+    // Passa só o id, pois a URL já carrega o valor
+    await deleteSample(id);
+    alert("Amostra deletada com sucesso.");
+    fetchSamples();
+  } catch (error) {
+    console.error("Erro ao deletar amostra", error);
+    alert("Erro ao deletar a amostra.");
+  }
+};
 
   const handleDeleteUser = async (id: number) => {
-    const confirmar = window.confirm("Tem certeza que deseja excluir este usuário?");
+     const confirmar = window.confirm(`Tem certeza que deseja excluir a amostra ${id}?`);
     if (!confirmar) return;
 
     try {
@@ -232,18 +237,7 @@ const MenuAdmin = () => {
     }
   };
 
-const handleSearch = async () => {
-  if (!searchTerm.trim()) {
-    fetchSamples(); // se a busca estiver vazia, recarrega tudo
-    return;
-  }
-  try {
-    const resultados = await searchSamplesByLocation(searchTerm.trim());
-    setSamples(resultados); // ou setSortedSamples se usar esse estado para exibição
-  } catch (erro) {
-    console.error("Erro ao buscar por localização:", erro);
-  }
-};
+
 
 const startEditMetodologia = (metodologia: MetodologiaData) => {
   setEditingMetodologia(metodologia);
@@ -295,6 +289,22 @@ const handleDeleteMetodologia = async (id: number) => {
   } catch (error) {
     console.error("Erro ao deletar metodologia:", error);
     alert("Erro ao deletar a metodologia.");
+  }
+};
+
+const handleSearch = async (term: string, metodologiaId: string) => {
+  try {
+    // Se ambos estiverem vazios, carrega tudo
+    if (!term && !metodologiaId) {
+      fetchSamples();
+      return;
+    }
+
+    // Usa a nova função de busca que envia ambos os parâmetros
+    const resultados = await searchSamplesByLocation(term, metodologiaId);
+    setSamples(resultados);
+  } catch (erro) {
+    console.error("Erro ao buscar amostras:", erro);
   }
 };
 
@@ -352,34 +362,7 @@ const handleDeleteMetodologia = async (id: number) => {
 </button>
         </div>
       </div>
-  <div style={{ display: "flex", alignItems: "center", marginBottom: "10px" }}>
-    <input
-      type="text"
-      placeholder="Buscar por localização..."
-      value={searchTerm}
-      onChange={(e) => setSearchTerm(e.target.value)}
-      style={{
-        padding: "8px",
-        borderRadius: "4px",
-        border: "1px solid #ccc",
-        width: "200px",
-        marginRight: "8px",
-      }}
-    />
-    <button
-      onClick={handleSearch}
-      style={{
-        padding: "3px 3px",
-        borderRadius: "4px",
-        backgroundColor: "#3498db",
-        color: "white",
-        border: "none",
-        cursor: "pointer",
-      }}
-    >
-      🔍
-    </button>
-  </div>
+  
       {showingMetodologias ? (
   <>
     <MetodologiaList 
@@ -423,13 +406,14 @@ const handleDeleteMetodologia = async (id: number) => {
 ) : (
   <>
     <SampleTable
-      samples={sortedSamples}
-      sortConfig={sortConfig}
-      onSort={handleSort}
-      onEdit={startEditSample}
-      onDelete={handleDeleteSample}
-      onView={handleViewSample}
-    />
+                    samples={sortedSamples}
+                    sortConfig={sortConfig}
+                    onSort={handleSort}
+                    onEdit={startEditSample}
+                    onDelete={handleDeleteSample}
+                    onView={handleViewSample}
+                    onSearch={handleSearch} 
+                    metodologias={metodologiasList}   />
           <div className="btn-group">
             <button className="btn-blue" onClick={() => setShowCreatePopup(true)}>
                       Cadastrar Amostra
@@ -541,7 +525,7 @@ const handleDeleteMetodologia = async (id: number) => {
 {showEditDiscoSamplePopup && editingDiscoSample && (
   <DiscoSampleEditPopup
     discoSample={editingDiscoSample}
-    //metodologias={metodologias}
+   
     onClose={() => {
       setShowEditDiscoSamplePopup(false);
       setEditingDiscoSample(null);

@@ -41,30 +41,32 @@ def list_all_samples(request):
 
 @api_view(["DELETE"])
 @permission_classes([IsAuthenticated])
-def delete_samples(request):
-   
-    ids = request.data.get("ids", [])
-    if not isinstance(ids, list) or not ids:
-        return Response({"error": "Informe uma lista de IDs para deletar."}, status=status.HTTP_400_BAD_REQUEST)
-    samples_to_delete = Sample.objects.filter(id__in=ids, user=request.user)
-    if not samples_to_delete.exists():
-        return Response({"error": "Nenhuma amostra encontrada com os IDs fornecidos."}, status=status.HTTP_404_NOT_FOUND)
-    count = samples_to_delete.count()
-    samples_to_delete.delete()
-    return Response({"message": f"{count} amostra(s) deletada(s) com sucesso."}, status=status.HTTP_200_OK)
+def delete_samples(request, id):
+    """
+    Deleta uma amostra pelo id, **sem verificar dono da amostra**.
+    """
+    try:
+        sample = Sample.objects.get(id=id)
+    except Sample.DoesNotExist:
+        return Response({"error": "Amostra não encontrada."}, status=status.HTTP_404_NOT_FOUND)
+    
+    sample.delete()
+    return Response({"message": "Amostra deletada com sucesso."}, status=status.HTTP_200_OK)
 
 @api_view(["PUT"])
 @permission_classes([IsAuthenticated])
 def update_sample(request, sample_id):
-   
     try:
         sample = Sample.objects.get(id=sample_id, user=request.user)
     except Sample.DoesNotExist:
         return Response({"error": "Amostra não encontrada."}, status=status.HTTP_404_NOT_FOUND)
+
     serializer = SampleSerializer(sample, data=request.data, partial=True)
+
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
+
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(["GET"])
@@ -92,13 +94,30 @@ def get_user_samples_ids(request, user_id):
 @permission_classes([IsAuthenticated])
 def search_samples_by_location(request):
     location_query = request.GET.get("location", "").strip()
+    metodologia_id = request.GET.get("metodologia_id", "").strip()
 
-    if not location_query:
+    # Se nenhum filtro foi passado, retorna erro
+    if not location_query and not metodologia_id:
         return Response(
-            {"error": "O parâmetro 'location' é obrigatório."},
+            {"error": "Informe ao menos 'location' ou 'metodologia_id' para busca."},
             status=status.HTTP_400_BAD_REQUEST
         )
 
-    samples = Sample.objects.filter(location__icontains=location_query, user=request.user)
+    filters = {"user": request.user}
+
+    if location_query:
+        filters["location__icontains"] = location_query
+
+    if metodologia_id:
+        filters["metodologia_id"] = metodologia_id
+
+    samples = Sample.objects.filter(**filters)
+    serializer = SampleSerializer(samples, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def samples_by_metodologia(request, metodologia_id):
+    samples = Sample.objects.filter(metodologia_id=metodologia_id, user=request.user)
     serializer = SampleSerializer(samples, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
