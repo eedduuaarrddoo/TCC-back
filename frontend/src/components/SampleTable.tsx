@@ -62,7 +62,7 @@ const SampleTable: React.FC<Props> = ({
   };
 
   return (
-    <div>
+    <div >
       {/* Campo de busca e select de metodologia */}
       <div style={{ display: "flex", alignItems: "center", marginBottom: "10px", gap: "8px" }}>
         <select
@@ -112,6 +112,7 @@ const SampleTable: React.FC<Props> = ({
       </div>
 
       {/* Tabela */}
+       <div className="sample-table-container">
       <table className="sample-table">
         <thead>
           <tr>
@@ -180,6 +181,7 @@ const SampleTable: React.FC<Props> = ({
           )}
         </tbody>
       </table>
+      </div>
     </div>
   );
 };

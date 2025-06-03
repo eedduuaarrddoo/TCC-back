@@ -1,12 +1,4 @@
-/* Garantir que a página ocupe 100% da altura da janela */
-html, body {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    font-family: sans-serif;
-  }
-  
-  /* Contêiner centralizado para login e cadastro */
+/* Contêiner centralizado para login e cadastro */
   .page-container {
     display: flex;
     justify-content: center;   /* Centraliza horizontalmente */

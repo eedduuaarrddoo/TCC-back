@@ -2,8 +2,9 @@ import React, { useEffect, useState } from "react";
 import { Table2, Pencil, Trash2 } from "lucide-react";
 import { getAllMetodologias, getSamplesByMetodologia } from "../controllers/sampleController";
 import jsPDF from "jspdf";
-//import autoTable from "jspdf-autotable";
+import "jspdf-autotable"; 
 import "../css/menu_admin.css";
+import autoTable from "jspdf-autotable";
 
 export interface MetodologiaData {
   id: number;
@@ -72,45 +73,193 @@ const MetodologiaList: React.FC<Props> = ({ onEdit, onView, onDelete }) => {
 
 const handleGeneratePdf = async (metodologia: MetodologiaData) => {
   try {
-    const samples = await getSamplesByMetodologia(metodologia.id);
+    const response = await getSamplesByMetodologia(metodologia.id);
+    const samples = response.samples || [];
+    const discoSamples = response.discsamples || [];
 
-    if (!samples || samples.length === 0) {
-      alert("Nenhuma amostra encontrada para essa metodologia.");
+    if (samples.length === 0 && discoSamples.length === 0) {
+      alert("Nenhuma amostra ou disco sample encontrada para essa metodologia.");
       return;
     }
 
-    // 1. Obter todos os campos únicos existentes nas amostras
-    const uniqueFields = new Set<string>();
-    samples.forEach((sample: any) => {
-      Object.keys(sample).forEach((key) => uniqueFields.add(key));
-    });
+    const sampleAllFields = [
+      "id",
+      "user",
+      "location",
+      "ph",
+      "depth",
+      "espacamento",
+      "arvore",
+      "porcentagem",
+      "observacao",
+      "espacamento2",
+      "altura",
+      "profundidade_info",
+      "vertice",
+      "talhao",
+      "parcela",
+      "tratamento",
+      "identificacao",
+      "ac",
+      "created_at",
+      "updated_at",
+    ];
 
-    const columns = Array.from(uniqueFields);
+    const sampleFieldLabels: Record<string, string> = {
+      id: "ID",
+      user: "Usuário",
+      location: "Local",
+      ph: "pH",
+      depth: "Profundidade",
+      espacamento: "Espaçamento",
+      arvore: "Árvore",
+      porcentagem: "Porcentagem",
+      observacao: "Observação",
+      espacamento2: "Espaçamento 2",
+      altura: "Altura",
+      profundidade_info: "Profundidade Info",
+      vertice: "Vértice",
+      talhao: "Talhão",
+      parcela: "Parcela",
+      tratamento: "Tratamento",
+      identificacao: "Identificação",
+      ac: "AC",
+      created_at: "Criado em",
+      updated_at: "Atualizado em",
+    };
 
-    // 2. Montar os dados da tabela com todas as colunas possíveis
-    const tableData = samples.map((sample: any) => {
-      return columns.map((col) => {
-        const value = sample[col];
+    const usedSampleFields = sampleAllFields.filter((field) =>
+      samples.some((s: any) => {
+        const value = field === "user" ? s.user?.username : s[field];
+        return value !== null && value !== undefined && value !== "";
+      })
+    );
 
-        if (typeof value === "object" && value !== null) {
-          return JSON.stringify(value);
+    const sampleHeaders = usedSampleFields.map(
+      (field) => sampleFieldLabels[field] || field
+    );
+
+    const sampleBody = samples.map((s: any) =>
+      usedSampleFields.map((field) => {
+        if (field === "user") return s.user?.username || "";
+        const val = s[field];
+        return val !== null && val !== undefined ? String(val) : "";
+      })
+    );
+
+    // --- DiscoSample ---
+    const discoAllFields = [
+      "id",
+      "parcelas",
+      "quantidade",
+      "porcentagem",
+      "observacao",
+      "metodologia",
+      "criado_em",
+    ];
+
+    const discoFieldLabels: Record<string, string> = {
+      id: "ID",
+      parcelas: "Parcelas",
+      quantidade: "Quantidade",
+      porcentagem: "Porcentagem",
+      observacao: "Observação",
+      metodologia: "Metodologia",
+      criado_em: "Criado em",
+    };
+
+    const usedDiscoFields = discoAllFields.filter((field) =>
+      discoSamples.some((d: any) => {
+        if (field === "metodologia") {
+          return d.metodologia?.nome;
         }
+        return d[field] !== null && d[field] !== undefined && d[field] !== "";
+      })
+    );
 
-        return value !== undefined && value !== null ? String(value) : "";
-      });
-    });
+    const discoHeaders = usedDiscoFields.map(
+      (field) => discoFieldLabels[field] || field
+    );
 
-    // 3. Criar o PDF
-    const doc = new jsPDF();
-    doc.text(`Amostras da Metodologia: ${metodologia.nome}`, 14, 15);
+    const discoBody = discoSamples.map((d: any) =>
+      usedDiscoFields.map((field) => {
+        if (field === "metodologia") return d.metodologia?.nome || "";
+        const val = d[field];
+        return val !== null && val !== undefined ? String(val) : "";
+      })
+    );
 
+    const doc = new jsPDF({ orientation: "landscape" });
+    doc.setFontSize(12);
+    doc.text(
+      `Amostras da Metodologia: ${metodologia.nome}`,
+      14,
+      15
+    );
+
+    const pageWidth = doc.internal.pageSize.getWidth() - 28;
+    const sampleColumnWidth = pageWidth / usedSampleFields.length;
+
+    // Desenha a tabela de Samples
     autoTable(doc, {
       startY: 20,
-      head: [columns],
-      body: tableData,
-      styles: { fontSize: 8 },
-      headStyles: { fillColor: [41, 128, 185] }, // azul escuro
+      head: [sampleHeaders],
+      body: sampleBody,
+      theme: "grid",
+      styles: {
+        fontSize: 6,
+        halign: "center",
+        valign: "middle",
+        cellPadding: 1,
+        overflow: "linebreak",
+      },
+      headStyles: {
+        fillColor: [240, 240, 240],
+        textColor: [0, 0, 0],
+        fontStyle: "bold",
+      },
+      columnStyles: usedSampleFields.reduce((acc, _, i) => {
+        acc[i] = { cellWidth: sampleColumnWidth };
+        return acc;
+      }, {} as Record<number, { cellWidth: number }>),
     });
+
+    // Usa o finalY da última tabela (Samples)
+    const sampleFinalY = doc.lastAutoTable?.finalY ?? 20;
+
+    // Se existir DiscoSamples, desenha abaixo
+    if (discoSamples.length > 0) {
+      const nextY = sampleFinalY + 10;
+      doc.text(
+        `DiscoSamples da Metodologia: ${metodologia.nome}`,
+        14,
+        nextY - 2
+      );
+
+      const discoColumnWidth = pageWidth / usedDiscoFields.length;
+      autoTable(doc, {
+        startY: nextY,
+        head: [discoHeaders],
+        body: discoBody,
+        theme: "grid",
+        styles: {
+          fontSize: 6,
+          halign: "center",
+          valign: "middle",
+          cellPadding: 1,
+          overflow: "linebreak",
+        },
+        headStyles: {
+          fillColor: [230, 230, 230],
+          textColor: [0, 0, 0],
+          fontStyle: "bold",
+        },
+        columnStyles: usedDiscoFields.reduce((acc, _, i) => {
+          acc[i] = { cellWidth: discoColumnWidth };
+          return acc;
+        }, {} as Record<number, { cellWidth: number }>),
+      });
+    }
 
     doc.save(`amostras_metodologia_${metodologia.id}.pdf`);
   } catch (err) {
@@ -118,6 +267,9 @@ const handleGeneratePdf = async (metodologia: MetodologiaData) => {
     console.error(err);
   }
 };
+
+
+
 
   return (
     <div className="metodologia-list">

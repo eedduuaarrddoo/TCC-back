@@ -1,17 +1,14 @@
-/* Reset e fundo geral */
-html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    font-family: 'Segoe UI', sans-serif;
-    background-color: #e6f0fa;
-  }
+
   
   /* Centraliza tudo com grid */
   .page-container {
-    display: grid;
-    place-items: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     height: 100vh;
+    width: 100%;
+    padding: 16px;
+
   }
   
   /* Painel principal */
@@ -22,6 +19,9 @@ html, body {
     width: 100%;
     max-width: 900px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    height: 90%;
+    overflow: auto;
   }
   
   /* Títulos */
@@ -43,6 +43,10 @@ html, body {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 1rem;
+    overflow-y: scroll;
+    height: 400px;
+    border-collapse: collapse;
+    table-layout: auto
   }
   
   .sample-table th,
@@ -243,4 +247,13 @@ html, body {
   padding: 8px 12px;
   border-radius: 4px;
   cursor: pointer;
+}
+
+.sample-table-container {
+  width: 100%;             
+  max-height: 400px;       
+  overflow-y: auto;        
+  overflow-x: auto;        
+  border: 1px solid #ddd;  
+  border-radius: 4px;      
 }

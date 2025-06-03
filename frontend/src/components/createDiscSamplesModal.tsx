@@ -17,7 +17,7 @@ const DiscoSampleCreatePopup: React.FC<DiscoSampleCreatePopupProps> = ({
   const [quantidade, setQuantidade] = useState<number>(0);
   const [porcentagem, setPorcentagem] = useState("");
   const [observacao, setObservacao] = useState("");
-  const [metodologiaId, setMetodologiaId] = useState<number | "">("");
+  const [metodologia_Id, setMetodologiaId] = useState<number | "">("");
 
   const [metodologias, setMetodologias] = useState<{ id: number; nome: string }[]>([]);
 
@@ -37,8 +37,8 @@ const DiscoSampleCreatePopup: React.FC<DiscoSampleCreatePopupProps> = ({
     formData.append("quantidade", quantidade.toString());
     formData.append("porcentagem", porcentagem);
     formData.append("observacao", observacao);
-    if (metodologiaId !== "") {
-      formData.append("metodologia", metodologiaId.toString());
+    if (metodologia_Id !== "") {
+      formData.append("metodologia_id", metodologia_Id.toString());
     }
 
     try {
@@ -85,7 +85,7 @@ const DiscoSampleCreatePopup: React.FC<DiscoSampleCreatePopupProps> = ({
           />
 
           <select
-            value={metodologiaId}
+            value={metodologia_Id}
             onChange={(e) => setMetodologiaId(Number(e.target.value))}
             required
           >

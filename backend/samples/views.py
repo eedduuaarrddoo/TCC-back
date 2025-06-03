@@ -1,11 +1,18 @@
+import io
 import json
+import os
+import zipfile
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-
 from .models import Sample
 from .serializers import SampleSerializer
+from discsamples.models import DiscoSample
+from discsamples.serializers import DiscoSampleSerializer
+
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
@@ -120,4 +127,43 @@ def search_samples_by_location(request):
 def samples_by_metodologia(request, metodologia_id):
     samples = Sample.objects.filter(metodologia_id=metodologia_id, user=request.user)
     serializer = SampleSerializer(samples, many=True)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+
+    discs = DiscoSample.objects.filter(metodologia_id=metodologia_id)
+    disc_serializer = DiscoSampleSerializer(discs, many=True)
+
+    return Response(
+        {
+            "samples": serializer.data,
+            "discsamples": disc_serializer.data
+        },
+        status=status.HTTP_200_OK
+    )
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_sample_attachments(request, sample_id):
+   
+    sample = get_object_or_404(Sample, id=sample_id)
+
+    
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, mode='w', compression=zipfile.ZIP_DEFLATED) as zip_file:
+        
+        if sample.anexo1 and sample.anexo1.name:
+            
+            filename1 = os.path.basename(sample.anexo1.name)
+            zip_file.write(sample.anexo1.path, arcname=filename1)
+
+        if sample.anexo2 and sample.anexo2.name:
+            filename2 = os.path.basename(sample.anexo2.name)
+            zip_file.write(sample.anexo2.path, arcname=filename2)
+
+    
+    buffer.seek(0)
+
+    
+    response = HttpResponse(buffer, content_type='application/zip')
+    response['Content-Disposition'] = f'attachment; filename="amostra_{sample.id}_anexos.zip"'
+    return response
+
+

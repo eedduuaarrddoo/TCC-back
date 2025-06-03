@@ -420,7 +420,7 @@ const handleSearch = async (term: string, metodologiaId: string) => {
             </button>
             <button className="btn-green" onClick={fetchSamples}>
               Atualizar Lista
-            </button>
+          </button>
           </div>
         </>
       )}

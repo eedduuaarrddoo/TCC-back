@@ -1,11 +1,4 @@
-/* Reset e fundo geral */
-html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    font-family: 'Segoe UI', sans-serif;
-    background-color: #e6f0fa;
-  }
+
   
   /* Centraliza tudo com grid */
   .page-container {
