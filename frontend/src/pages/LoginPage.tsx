@@ -21,7 +21,7 @@ const LoginPage = () => {
     try {
       const { is_admin } = await authenticateUser({ email, password });
       // redireciona conforme perfil
-      navigate(is_admin ? "/menuadmin" : "/menuusuario");
+      navigate(is_admin ? "/menuadmin" : "/menuUsuario");
     } catch (err: any) {
       console.error(err);
       setError(err.error || "Credenciais inválidas ou problema de conexão");

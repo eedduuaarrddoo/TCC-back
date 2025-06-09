@@ -3,7 +3,7 @@ import { jsPDF } from "jspdf";
 import { FileText, X } from "lucide-react";
 import autoTable from "jspdf-autotable";
 import api from "../services/api";
-
+import "../css/menu_admin.css";
 interface SampleDetailsProps {
   sample: {
     id: number;
@@ -14,11 +14,11 @@ interface SampleDetailsProps {
     created_at: string;
     updated_at?: string;
     metodologia: { id: number; nome: string };
-    espacamento?: string;
+    spacamento?: string;
+    espacamento2?: string;
     arvore?: string;
     porcentagem?: string;
     observacao?: string;
-    espacamento2?: string;
     altura?: string;
     profundidade_info?: string;
     vertice?: string;
@@ -41,7 +41,7 @@ const SampleDetailsModal: React.FC<SampleDetailsProps> = ({ sample, onClose }) =
     { label: "Localização", value: sample.location },
     { label: "pH", value: sample.ph },
     { label: "Profundidade", value: `${sample.depth} cm` },
-    { label: "Espaçamento", value: sample.espacamento },
+    { label: "Espaçamento", value: sample.spacamento},
     { label: "Espaçamento 2", value: sample.espacamento2 },
     { label: "Árvore", value: sample.arvore },
     { label: "Porcentagem", value: sample.porcentagem },
@@ -140,35 +140,36 @@ const SampleDetailsModal: React.FC<SampleDetailsProps> = ({ sample, onClose }) =
   };
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content">
-        <div className="modal-header">
-          <h2>Detalhes da Amostra</h2>
-          <button onClick={onClose} className="btn-icon">
-            <X size={24} />
-          </button>
-        </div>
+  <div className="popup-overlay">
+    <div className="popup">
+      <div className="modal-header">
+        <h2>Detalhes da Amostra</h2>
+        <button onClick={onClose} className="btn-icon">
+          <X size={24} />
+        </button>
+      </div>
 
-        <div className="modal-body">
-          {camposVisiveis.map((campo, index) => (
-            <div className="detail-row" key={index}>
-              <label>{campo.label}:</label>
-              <span>{campo.value}</span>
-            </div>
-          ))}
-        </div>
+      <div className="modal-body">
+        {camposVisiveis.map((campo, index) => (
+          <div className="detail-row" key={index}>
+            <label>{campo.label}:</label>
+            <span>{campo.value}</span>
+          </div>
+        ))}
+      </div>
 
-        <div className="modal-footer">
-          <button className="btn-red" onClick={onClose}>
-            Fechar
-          </button>
-          <button className="btn-green" onClick={handleGeneratePDF}>
-            <FileText size={18} /> Gerar PDF
-          </button>
-        </div>
+      <div className="modal-footer">
+        <button className="btn-red" onClick={onClose}>
+          Fechar
+        </button>
+        <button className="btn-green" onClick={handleGeneratePDF}>
+          <FileText size={18} /> Gerar PDF
+        </button>
       </div>
     </div>
-  );
+  </div>
+);
+
 };
 
 export default SampleDetailsModal;

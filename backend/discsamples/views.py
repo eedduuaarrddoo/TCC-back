@@ -66,3 +66,30 @@ def delete_disc_samples(request):
     count = to_delete.count()
     to_delete.delete()
     return Response({"message": f"{count} DiscoSample(s) deletado(s) com sucesso."}, status=status.HTTP_200_OK)
+
+
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def search_disc_samples_by_local(request):
+    local_query = request.GET.get("local", "").strip()
+    metodologia_id = request.GET.get("metodologia_id", "").strip()
+
+    filters = {}
+
+    if local_query:
+        filters["local__icontains"] = local_query
+
+    if metodologia_id:
+        filters["metodologia_id"] = metodologia_id
+
+    # Se nenhum filtro foi passado, retorna todos os discos
+    if not filters:
+        samples = DiscoSample.objects.all().order_by("id")
+    else:
+        samples = DiscoSample.objects.filter(**filters).order_by("id")
+
+    serializer = DiscoSampleSerializer(samples, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+

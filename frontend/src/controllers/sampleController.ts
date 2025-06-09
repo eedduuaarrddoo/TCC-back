@@ -53,7 +53,9 @@ export interface DiscoSampleData {
 
 export const createSample = async (formData: FormData) => {
   return api.post("/sample/create/", formData, {
-   
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
   });
 };
 
@@ -218,18 +220,17 @@ export const deleteMetodologias = async (ids: number[]) => {
 };
 
 // SEARCH BY MATERIAL
-export const searchMetodologiasByMaterial = async (material: string, metodologiaId: string) => {
+export const searchMetodologiasByNome = async (nome: string) => {
   try {
-    const response = await api.get("/metodologia/search/material/", {
+    const response = await api.get("/metodologia/search/nome/", {
       params: {
-        material,
-        metodologia_id: metodologiaId,
+        nome,
       },
     });
     return response.data;
   } catch (error: any) {
-    console.error("Erro ao buscar metodologias por material:", error.response?.data || error);
-    throw error.response?.data || "Erro ao buscar por material";
+    console.error("Erro ao buscar metodologias por nome:", error.response?.data || error);
+    throw error.response?.data || "Erro ao buscar por nome";
   }
 };
 
@@ -302,5 +303,28 @@ export const getSamplesByMetodologia = async (metodologiaId: number) => {
   } catch (error: any) {
     console.error("Erro ao buscar amostras da metodologia:", error.response?.data || error);
     throw error.response?.data || "Erro ao buscar amostras da metodologia";
+  }
+};
+
+export const searchDiscoSamples = async (
+  local?: string,
+  metodologiaId?: number
+) => {
+  try {
+    const params: Record<string, string> = {};
+
+    if (local) {
+      params.local = local;
+    }
+
+    if (metodologiaId !== undefined) {
+      params.metodologia_id = metodologiaId.toString();
+    }
+
+    const response = await api.get("/discsamples/Search/", { params });
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao buscar DiscoSamples por local/metodologia:", error);
+    return [];
   }
 };

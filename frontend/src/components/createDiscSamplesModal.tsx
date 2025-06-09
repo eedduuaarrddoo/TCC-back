@@ -18,7 +18,7 @@ const DiscoSampleCreatePopup: React.FC<DiscoSampleCreatePopupProps> = ({
   const [porcentagem, setPorcentagem] = useState("");
   const [observacao, setObservacao] = useState("");
   const [metodologia_Id, setMetodologiaId] = useState<number | "">("");
-
+  const [local, setLocal] = useState("");
   const [metodologias, setMetodologias] = useState<{ id: number; nome: string }[]>([]);
 
   useEffect(() => {
@@ -33,6 +33,7 @@ const DiscoSampleCreatePopup: React.FC<DiscoSampleCreatePopupProps> = ({
     e.preventDefault();
 
     const formData = new FormData();
+    formData.append("local", local);
     formData.append("parcelas", parcelas);
     formData.append("quantidade", quantidade.toString());
     formData.append("porcentagem", porcentagem);
@@ -53,10 +54,17 @@ const DiscoSampleCreatePopup: React.FC<DiscoSampleCreatePopupProps> = ({
   };
 
   return (
+    
     <div className="popup-overlay">
       <div className="popup">
         <h2>Cadastrar DiscoSample</h2>
         <form onSubmit={handleSubmit}>
+        <input
+            type="text"
+            placeholder="Local"
+            value={local}
+            onChange={(e) => setLocal(e.target.value)}
+        />
           <input
             type="text"
             placeholder="Parcelas"

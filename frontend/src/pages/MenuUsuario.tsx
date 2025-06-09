@@ -4,11 +4,7 @@ import {
   createSample,
   deleteSample,
   updateSample,
-  
-  
-  
   getSampleDetails,
-  getUserSamplesIds,
   searchSamplesByLocation,
   getAllMetodologias,
   createMetodologia,

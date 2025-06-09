@@ -74,11 +74,11 @@ def delete_metodologias(request):
 # SEARCH (exemplo buscando no campo material)
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
-def search_metodologias_by_material(request):
-    query = request.GET.get("material", "").strip()
+def search_metodologias_by_nome(request):
+    query = request.GET.get("nome", "").strip()
     if not query:
-        return Response({"error": "O parâmetro 'material' é obrigatório."}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"error": "nada retornado."}, status=status.HTTP_400_BAD_REQUEST)
 
-    metodologias = Metodologia.objects.filter(material__icontains=query)
+    metodologias = Metodologia.objects.filter(nome__icontains=query)
     serializer = MetodologiaSerializer(metodologias, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)

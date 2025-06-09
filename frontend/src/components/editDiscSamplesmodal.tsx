@@ -4,6 +4,7 @@ import { getAllMetodologias } from "../controllers/sampleController";
 
 interface DiscoSample {
   id: number;
+  local?: string;
   parcelas: string;
   quantidade: number;
   porcentagem: string;
@@ -35,15 +36,15 @@ const DiscoSampleEditPopup: React.FC<DiscoSampleEditPopupProps> = ({
   const [quantidade, setQuantidade] = useState(discoSample.quantidade);
   const [porcentagem, setPorcentagem] = useState(discoSample.porcentagem);
   const [observacao, setObservacao] = useState(discoSample.observacao || "");
-  const [metodologiaId, setMetodologiaId] = useState<number | undefined>(
-  discoSample.metodologia?.id
-);
+  const [metodologiaId, setMetodologiaId] = useState<number | undefined>(discoSample.metodologia?.id);
   const [metodologias, setMetodologias] = useState<Metodologia[]>([]);
+  const [local, setLocal] = useState(discoSample.local || "");
   
   const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
 
   const formData = new FormData();
+  formData.append("local", local);
   formData.append("parcelas", parcelas);
   formData.append("quantidade", quantidade.toString());
   formData.append("porcentagem", porcentagem);
@@ -81,6 +82,12 @@ const DiscoSampleEditPopup: React.FC<DiscoSampleEditPopupProps> = ({
       <div className="popup">
         <h2>Editar DiscoSample</h2>
         <form onSubmit={handleSubmit}>
+    <input
+            type="text"
+            placeholder="Local"
+            value={local}
+            onChange={(e) => setLocal(e.target.value)}
+            />
           <input
             type="text"
             placeholder="Parcelas"

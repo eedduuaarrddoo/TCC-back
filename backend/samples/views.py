@@ -4,7 +4,7 @@ import os
 import zipfile
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, parser_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
@@ -12,14 +12,15 @@ from .models import Sample
 from .serializers import SampleSerializer
 from discsamples.models import DiscoSample
 from discsamples.serializers import DiscoSampleSerializer
-
+from rest_framework.parsers import MultiPartParser, FormParser
 
 @api_view(["POST"])
+@parser_classes([MultiPartParser, FormParser])
 @permission_classes([IsAuthenticated])
 def create_sample(request):
     serializer = SampleSerializer(data=request.data)
     if serializer.is_valid():
-        serializer.save(user=request.user)  # atribui o usuário autenticado
+        serializer.save(user=request.user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
